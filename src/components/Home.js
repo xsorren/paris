@@ -4,13 +4,16 @@ import React from "react"
 import TeamList from "./TeamList"
 import References from "./References"
 import Subscribe from "./Subscribe"
-import BestFlatList from "./BestFlatList"
+import Map from "./Map"
+import Info from "./Info"
 
 const Home=()=>{
     return (
         <React.Fragment>
             <Banner/>
+            <Info />
             <Subscribe/>
+            <Map />
         </React.Fragment>
     )
 }
