@@ -1,6 +1,6 @@
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
-const BlogItem = ({title,link}) => {
+const BlogItem = ({ title, link }) => {
     return (
         <div className="col-lg-4">
             <div className="blog-item">
@@ -14,8 +14,8 @@ const BlogItem = ({title,link}) => {
                         <div className="blog-info-item"><i className="far fa-comments"></i><span>0 Comments</span></div>
                     </div>
                     <div className="blog-text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
-                                </div>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                    </div>
                 </div>
             </div>
         </div>

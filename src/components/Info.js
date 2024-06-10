@@ -7,7 +7,7 @@ const Info = () => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '100vh', // Esto asegura que el contenido siempre esté centrado verticalmente también.
+    minHeight: '200px', 
     flexDirection: 'column'
   };
 
