@@ -12,7 +12,6 @@ const Home=()=>{
         <React.Fragment>
             <Banner/>
             <Info />    
-            <Subscribe/>
             <Map />
         </React.Fragment>
     )
