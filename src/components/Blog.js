@@ -1,6 +1,7 @@
 import BlogItem from "./BlogItem"
 
 const Blog = () => {
+    let propiedades = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     return (
         <section className="blog">
             <div className="page-top">
@@ -15,16 +16,13 @@ const Blog = () => {
             </div>
             <div className="page-content">
                 <div className="container">
-                    <div className="row"> 
-                        <BlogItem link="blog-1" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit" />
-                        <BlogItem link="blog-2" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit" />
-                        <BlogItem link="blog-3" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-4" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-5" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-6" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-7" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-8" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
-                        <BlogItem link="blog-9" title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"/>
+                    <div className="row">
+                        {propiedades.map((e) => (
+                            
+                            <BlogItem link="blog-1" title={e} />
+
+                        ))
+                        }
                     </div>
                 </div>
             </div>
