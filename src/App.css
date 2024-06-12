@@ -12,7 +12,7 @@
   padding: 0;
 }
 .header{
-  background-color: white;
+  background-color: #012161;
 }
 .nav-item{
   position: relative;
@@ -21,6 +21,7 @@
   padding-top: 10px;
   padding-bottom: 10px;
   cursor: pointer;
+  color: #fefcff;
 }
 .nav-item:hover .sub-ul{
   display: block;
@@ -125,7 +126,7 @@
 }
 .banner-title{
   color:white;
-  font-size: 50px;
+  font-size: 40px;
   /*color: #1a2340;*/
 }
 .title-area{
@@ -162,7 +163,7 @@
 .nav-link{
   font-size: 14px;
   font-weight: 600;
-  color:#27282e  !important;
+  color:#fefcff  !important;
 }
 
 .navbar-brand{
@@ -209,11 +210,11 @@
 
 .footer{
   padding:4rem 0;
-  background: #27282e;
+  background: #012161;
   color:white;
 }
 .footer .fa-instagram,.footer .fa-facebook,.footer .fa-twitter{
-  color: #ffffff8a !important;
+  color: #fffffffa !important;
   font-size: 22px;
 }
 .footer-title{
@@ -229,11 +230,11 @@
   margin-left: 0;
   margin-bottom: 10px;
   font-size: 15px;
-  color: #ffffff8a;
+  color: #fffffffa;
 }
 .footer-other-text{
   font-size: 15px;
-  color: #ffffff8a;
+  color: #fffffffa;
 }
 .fa-home{
   font-size: 40px
@@ -252,7 +253,7 @@
 .footer-social-item{
   width: 45px;
   height: 45px;
-  background: #393a42;
+  background: #012161;
   margin: 5px;
   display: flex;
   justify-content: center;
@@ -457,7 +458,7 @@ section {
 
 
 .page-top{
-  background: #364465;
+  background: #012161;
   padding: 50px;
   color: white;
 }
@@ -551,7 +552,7 @@ section {
 }
 .blog-info-item{
   font-size: 13px;
-  color: #757575;
+  color: #020014;
 }
 .blog-info-item:nth-child(1){
   margin-right: 15px;
@@ -569,7 +570,7 @@ section {
   border-radius: 10px;
 }
 .about-text{
-  color: #797979e0;
+  color: #020014;
   font-size: 17px;
   margin: 15px 0;
 }
@@ -585,12 +586,13 @@ section {
   font-size: 14px;  
   margin-bottom: 5px;
   font-weight: bold;
-  color: #364465;
+  color: #020014;
   display: flex;
   align-items: center;
 }
 .about-item{
   padding: 30px;
+  color: #020014;
 }
 /* About End */
 

@@ -1,5 +1,5 @@
-import React from "react"
-import {Link} from "react-router-dom"
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
     return (
@@ -9,10 +9,7 @@ const Header = () => {
                     <div className="container-fluid">
                         <Link className="navbar-brand" to="/">
                             <div className="d-flex align-items-center">
-                            <i className="fas fa-home"></i>
-                                <span className="ms-2">
-                                    MB
-                           </span>
+                                <img src={"/img/LOGOINMO.jpeg"} alt="Logo" style={{ height: '50px', width: '70px' }} /> 
                             </div>
                         </Link>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,24 +18,16 @@ const Header = () => {
                         <div className="collapse navbar-collapse" id="navbarNav">
                             <ul className="navbar-nav ms-auto">
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/">Home</Link>
+                                    <Link className="nav-link" to="/">Inicio</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link  className="nav-link" to="/blog">Blog</Link>
+                                    <Link className="nav-link" to="/blog">Nuestras Propiedades</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link  className="nav-link" to="/about">About</Link>
+                                    <Link className="nav-link" to="/about">Sobre Nosotros</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="#">Category <i className="fas fa-chevron-down"></i></Link>
-                                    <ul className="sub-ul">
-                                        <li><Link to="#">item</Link></li>
-                                        <li><Link to="#">item</Link></li>
-                                        <li><Link to="#">item</Link></li>
-                                    </ul>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/contact">Contact</Link>
+                                    <Link className="nav-link" to="/contact">Contactos</Link>
                                 </li>
                             </ul>
                         </div>
@@ -46,7 +35,7 @@ const Header = () => {
                 </nav>
             </div>
         </div>
-    )
+    );
 }
 
 export default Header;

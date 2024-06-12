@@ -10,20 +10,20 @@ const Blog = () => {
 
     let propiedades = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    // Defining inline styles
+    // Definiendo estilos en línea
     const filterButtonStyle = {
         padding: '10px 20px',
         border: 'none',
-        backgroundColor: 'orange',
+        backgroundColor: '#012161', // Color de fondo azul oscuro
+        color: '#ffffff',           // Color de texto blanco
         cursor: 'pointer',
         margin: '0 5px',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
     };
 
     const activeFilterButtonStyle = {
         ...filterButtonStyle,
-        backgroundColor: '#007bff',
-        color: '#ffffff'
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Añadir sombra para el botón activo
     };
 
     return (
@@ -32,8 +32,7 @@ const Blog = () => {
                 <div className="container">
                     <div className="filtros">
                         <div className="col-lg-12">
-                            <h1 className="page-title">Blog</h1>
-                            <h2 className="page-description">Blog</h2>
+                            <h1 className="page-title">Nuestras Propiedades</h1>
                         </div>
                     </div>
                 </div>
@@ -41,10 +40,30 @@ const Blog = () => {
             <div className="page-content">
                 <div className="container">
                     <div className="filters">
-                        <button style={selectedFilter === 'house' ? activeFilterButtonStyle : filterButtonStyle} onClick={() => handleFilterChange('house')}>Casas</button>
-                        <button style={selectedFilter === 'apartment' ? activeFilterButtonStyle : filterButtonStyle} onClick={() => handleFilterChange('apartment')}>Departamentos</button>
-                        <button style={selectedFilter === 'lot' ? activeFilterButtonStyle : filterButtonStyle} onClick={() => handleFilterChange('lot')}>Lotes</button>
-                        <button style={selectedFilter === 'commercial' ? activeFilterButtonStyle : filterButtonStyle} onClick={() => handleFilterChange('commercial')}>Locales</button>
+                        <button 
+                            style={selectedFilter === 'house' ? activeFilterButtonStyle : filterButtonStyle} 
+                            onClick={() => handleFilterChange('house')}
+                        >
+                            Casas
+                        </button>
+                        <button 
+                            style={selectedFilter === 'apartment' ? activeFilterButtonStyle : filterButtonStyle} 
+                            onClick={() => handleFilterChange('apartment')}
+                        >
+                            Departamentos
+                        </button>
+                        <button 
+                            style={selectedFilter === 'lot' ? activeFilterButtonStyle : filterButtonStyle} 
+                            onClick={() => handleFilterChange('lot')}
+                        >
+                            Lotes
+                        </button>
+                        <button 
+                            style={selectedFilter === 'commercial' ? activeFilterButtonStyle : filterButtonStyle} 
+                            onClick={() => handleFilterChange('commercial')}
+                        >
+                            Locales
+                        </button>
                     </div>
                     <div className="row">
                         {propiedades.map((e) => (

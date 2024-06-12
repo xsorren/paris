@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faMapMarkerAlt, faPhoneAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faBuilding, faMoneyBillAlt } from '@fortawesome/free-solid-svg-icons';
 
 const Info = () => {
   const style = {
@@ -8,7 +8,8 @@ const Info = () => {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '200px', 
-    flexDirection: 'column'
+    flexDirection: 'column',
+    color: '#012161'
   };
 
   return (
@@ -17,23 +18,20 @@ const Info = () => {
         <div className="row">
           <div className="col-lg-4">
             <div className="contact-item text-center">
-              <FontAwesomeIcon icon={faEnvelope} size="2x" />
-              <h5>Mail</h5>
-              <h6>info@info.com</h6>
+            <FontAwesomeIcon icon={faUsers} size="2x" />
+              <h5>Tasaciones y Asesoramientos</h5>
             </div>
           </div>
           <div className="col-lg-4">
             <div className="contact-item text-center">
-              <FontAwesomeIcon icon={faMapMarkerAlt} size="2x" />
-              <h5>Address</h5>
-              <h6>Lorem Ipsum</h6>
+              <FontAwesomeIcon icon={faBuilding} size="2x" />
+              <h5>Casa, Lotes y mas </h5>
             </div>
           </div>
           <div className="col-lg-4">
             <div className="contact-item text-center">
-              <FontAwesomeIcon icon={faPhoneAlt} size="2x" />
-              <h5>Phone</h5>
-              <h6>00000000000</h6>
+              <FontAwesomeIcon icon={faMoneyBillAlt} size="2x" />
+              <h5>El mejor precio para vos</h5>
             </div>
           </div>
         </div>

@@ -34,8 +34,8 @@ const Banner = () => {
                     <div className="row">
                         <div className="col-lg-6 mx-auto">
                             <div className="banner-area text-center pt-4 pb-4">
-                                <h2 className="mt-2 mb-4 banner-title"><strong> Lorem Ipsum Dolor</strong> </h2>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                                <h2 className="mt-2 mb-4 banner-title"><strong>Paris Negocios Inmobiliarios</strong> </h2>
+                                <p></p>
                                 {findResult()}
                             </div>
                         </div>
