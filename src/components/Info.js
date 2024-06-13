@@ -9,7 +9,9 @@ const Info = () => {
     alignItems: 'center',
     minHeight: '200px', 
     flexDirection: 'column',
-    color: '#012161'
+    color: '#012161',
+    paddingTop: 40,
+    paddingBottom: 40
   };
 
   return (

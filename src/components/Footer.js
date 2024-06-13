@@ -6,7 +6,7 @@ const Footer = () => {
         <section className="footer">
 
             <div className="container">
-                <div className="row">
+                <div className="row" style={{display:"flex", justifyContent: "space-evenly"}}>
                     <div className="col-lg-3 col-md-6">
                     <FontAwesomeIcon icon={faUserTie} size="2x" />
                         <span className="footer-other-text d-block mt-3 mb-3">
@@ -34,7 +34,7 @@ const Footer = () => {
                                 <div className="footer-info-item"><i className="fas fa-clock"></i></div> <span>08:00-13:00 - 15:00-19:00</span>
                             </li>
                             <li className="d-flex">
-                                <div className="footer-info-item" ><i className="fas fa-envelope"></i></div> <span>parisnegociosinmobiliarios@gmail.com</span>
+                                <div style={{marginRight: 10}} className="footer-info-item" ><i className="fas fa-envelope"></i></div> <span>parisnegociosinmobiliarios@gmail.com</span>
                             </li>
                             <li className="d-flex">
                                 <div className="footer-info-item"><i className="fas fa-map-marker-alt"></i></div> <span> calle 28 n°917, Navarro, Buenos Aires </span>

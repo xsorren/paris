@@ -7,9 +7,9 @@ const Header = () => {
             <div className="container">
                 <nav className="navbar navbar-expand-lg navbar-light">
                     <div className="container-fluid">
-                        <Link className="navbar-brand" to="/">
-                            <div className="d-flex align-items-center">
-                                <img src={"/img/LOGOINMO.jpeg"} alt="Logo" style={{ height: '50px', width: '70px' }} /> 
+                        <Link to="/">
+                            <div style={{padding:8}}>
+                                <img src={"/img/LOGOINMO.png"} style={{maxHeight:70}}alt="Logo" /> 
                             </div>
                         </Link>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
