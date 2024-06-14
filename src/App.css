@@ -261,6 +261,15 @@
   align-items: center;
   border-radius: 50%;
 }
+.icon {
+  font-size: 48px; /* Tamaño del icono */
+  color: #002160  ; /* Color del icono */
+  transition: transform 0.3s;
+}
+
+.icon:hover {
+  transform: scale(1.1); /* Efecto de aumento al pasar el cursor */
+}
 .footer-info-item{
   width: 25px;
 }
@@ -762,4 +771,9 @@ section {
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
+}
+
+.blog-detail-cont {
+  display: flex;
+  justify-content: center;
 }
