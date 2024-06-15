@@ -59,8 +59,7 @@ const CreateProperty = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
-                            <h1 className="page-title">Create Property</h1>
-                            <h2 className="page-description">Enter property details below</h2>
+                            <h1 className="page-title">Agregar una propiedad</h1>
                         </div>
                     </div>
                 </div>
@@ -72,29 +71,29 @@ const CreateProperty = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="row">
                                     <div className="col-lg-6">
-                                        <label>Title</label>
+                                        <label>Titulo</label>
                                         <input type="text" name="title" className="inp-contact" value={formData.title} onChange={handleInputChange} />
                                     </div>
                                     <div className="col-lg-6">
-                                        <label>Type</label>
+                                        <label>Tipo de propiedad</label>
                                         <select name="type" className="inp-contact" value={formData.type} onChange={handleInputChange}>
-                                            <option value="">Select Type</option>
-                                            <option value="house">House</option>
-                                            <option value="apartment">Apartment</option>
-                                            <option value="lot">Lot</option>
-                                            <option value="commercial">Commercial Space</option>
+                                            <option value="">Seleccionar tipo de propiedad</option>
+                                            <option value="house">Casas</option>
+                                            <option value="apartment">Departamentos</option>
+                                            <option value="lot">Lotes</option>
+                                            <option value="commercial">Local</option>
                                         </select>
                                     </div>
                                     <div className="col-lg-12">
-                                        <label>Description</label>
+                                        <label>Descripcion de la propiedad</label>
                                         <textarea name="description" className="ta-contact" rows="4" value={formData.description} onChange={handleInputChange}></textarea>
                                     </div>
                                     <div className="col-lg-12">
-                                        <label>Images (multiple)</label>
+                                        <label>Agregar imagen de propiedad (multiple)</label>
                                         <input type="file" multiple className="inp-contact" onChange={handleImageChange} />
                                     </div>
                                     <div className="col-lg-12">
-                                        <button type="submit" className="btn-contact">Save Property</button>
+                                        <button type="submit" className="btn-contact">Guardar Propiedad</button>
                                     </div>
                                 </div>
                             </form>
