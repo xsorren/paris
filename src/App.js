@@ -9,6 +9,7 @@ import Blog from "./components/Blog"
 import BlogDetail from "./components/BlogDetail"
 import {BrowserRouter as Router,Route} from "react-router-dom";
 import CreateProperty from './components/CreateProperty';
+import Login from './components/Login';
  
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <div className="App">
         <Header/>
         <Route path="/" exact component={Home}></Route>
+        <Route path="/login"  component={Login}></Route>
         <Route path="/contact"  component={Contact}></Route>
         <Route path="/create"  component={CreateProperty}></Route>
         <Route path="/about"  component={About}></Route>
