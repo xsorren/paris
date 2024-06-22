@@ -40,17 +40,17 @@ const Sidebar = () => {
                     </section>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
-    <a href="https://www.instagram.com/tuusuario" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div className="icon IgIcon">
+                 <a href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="icon IgIcon">
             <i className="fab fa-instagram"></i>
         </div>
     </a>
-    <a href="mailto:tuemail@dominio.com" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <a href="parisnegociosinmobiliarios@gmail.com" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="icon">
             <FontAwesomeIcon icon={faEnvelope} />
         </div>
     </a>
-    <a href="tel:+1234567890" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <a href="tel:+542227-535057" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="icon">
             <FontAwesomeIcon icon={faPhone} />
         </div>

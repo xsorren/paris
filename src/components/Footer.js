@@ -1,14 +1,14 @@
 import React from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserTie, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+
 const Footer = () => {
     return (
         <section className="footer">
-
             <div className="container">
-                <div className="row" style={{display:"flex", justifyContent: "space-evenly"}}>
+                <div className="row" style={{ display: "flex", justifyContent: "space-evenly" }}>
                     <div className="col-lg-3 col-md-6">
-                    <FontAwesomeIcon icon={faUserTie} size="2x" />
+                        <FontAwesomeIcon icon={faUserTie} size="2x" />
                         <span className="footer-other-text d-block mt-3 mb-3">
                             Paris Negocios Inmobiliarios
                         </span>
@@ -19,11 +19,16 @@ const Footer = () => {
                             Coleg. N° 4058 T°IX F°4058 - CMCPDJ Mercedes
                         </span>
                         <div className="footer-social">
-                        <div className="footer-social-item"><FontAwesomeIcon icon={faEnvelope} size="lg" /></div>
-                            <div className="footer-social-item"> <i className="fab fa-instagram"></i></div>
+                            <a href="mailto:parisnegociosinmobiliarios@gmail.com" style={{ textDecoration: 'none', color: 'inherit', marginRight: '10px' }}>
+                                <FontAwesomeIcon icon={faEnvelope} size="lg" />
+                            </a>
+                            <a href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <div>
+                              <i className="fab fa-instagram"></i>
+                            </div>
+                            </a>
                         </div>
                     </div>
-                
                     <div className="col-lg-3 col-md-6">
                         <p className="footer-title">Contactos</p>
                         <ul className="footer-ul">
@@ -44,7 +49,7 @@ const Footer = () => {
                             </li>
                         </ul>
                     </div>
-                    {/*<div className="col-lg-3 col-md-6">
+                    {/* <div className="col-lg-3 col-md-6">
                         <p className="footer-title">Subscribe</p>
                         <span className="footer-other-text">
                             Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore dolore magna
@@ -53,12 +58,11 @@ const Footer = () => {
                             <input type="text" placeholder="Email" className="inp-footer w-100" />
                         </div>
                         <button className="btn-subscribe">Subscribe</button>
-                    </div>*/}
-
+                    </div> */}
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
-export default Footer
+export default Footer;

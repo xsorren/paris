@@ -261,6 +261,9 @@
   align-items: center;
   border-radius: 50%;
 }
+.icon-contact{
+  margin: 10px;
+}
 .icon {
   font-size: 48px; /* Tamaño del icono */
   color: #002160  ; /* Color del icono */
@@ -514,7 +517,14 @@ section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50px;
+  padding: 5px;
+  background: whitesmoke;
+}
+.contact .contact-item h5{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px;
   background: whitesmoke;
 }
 .contact .fas{
