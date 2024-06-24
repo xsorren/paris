@@ -1,6 +1,7 @@
 import { faEnvelope, faPhone, fainstagram, } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+
 const Sidebar = () => {
     return (
         <div >

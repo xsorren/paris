@@ -19,7 +19,7 @@ const Footer = () => {
                             Coleg. N° 4058 T°IX F°4058 - CMCPDJ Mercedes
                         </span>
                         <div className="footer-social">
-                            <a href="mailto:parisnegociosinmobiliarios@gmail.com" style={{ textDecoration: 'none', color: 'inherit', marginRight: '10px' }}>
+                            <a href="/Contact" style={{ textDecoration: 'none', color: 'inherit', marginRight: '10px' }}>
                                 <FontAwesomeIcon icon={faEnvelope} size="lg" />
                             </a>
                             <a href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>

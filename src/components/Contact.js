@@ -1,72 +1,68 @@
+import React, { useRef } from 'react';
+import emailjs from 'emailjs-com';
+import toast, { Toaster } from 'react-hot-toast';
+
 const Contact = () => {
-    return (
-        <section className="contact">
-            <div className="page-top">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <h1 className="page-title">Contacto</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="page-content">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div className="row">
-                                <div className="col-lg-4">
-                                    <div className="contact-item">
-                                        <i className="fas fa-envelope"></i>
-                                        <h5>Mail</h5>
-                                        <h6>parisnegociosinmobiliarios@gmail.com</h6>
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <div className="contact-item">
-                                        <i className="fas fa-map-marker-alt"></i>
-                                        <h5>Ubicacion</h5>
-                                        <h6>calle 28 n°917, Navarro, Buenos Aires</h6>
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <div className="contact-item">
-                                        <i className="fas fa-phone-alt"></i>
-                                        <h5>Telefono</h5>
-                                        <h6>2227-535057</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-12">
-                            <div className="row mt-5">
-                                <div className="col-lg-6">
-                                    <label>Nombre y Apellido</label>
-                                    <input type="text" className="inp-contact" />
-                                </div>
-                                <div className="col-lg-6">
-                                    <label>Telefono</label>
-                                    <input type="text" className="inp-contact" />
-                                </div>
-                                <div className="col-lg-12">
-                                    <label>Asunto</label>
-                                    <input type="text" className="inp-contact" />
-                                </div>
-                                <div className="col-lg-12">
-                                    <label>Mensaje</label>
-                                    <textarea type="text" className="ta-contact" rows="4"></textarea>
-                                </div>
-                                <div className="col-lg-12">
-                                    <button className="btn-contact">Enviar</button>
-                                </div>
-                            </div>
-                        </div>
+  const form = useRef();
 
-                    </div>
-                </div>
-            </div>
-        </section>
-    )
-}
+  const sendEmail = (e) => {
+    e.preventDefault();
 
-export default Contact
+    emailjs.sendForm('service_gmmagig', 'template_v0idr8a', form.current, '2AntrPYn0iA2iDL3R')
+      .then((result) => {
+        console.log(result.text);
+        toast.success('Se envió su mail a Paris Negocios Inmobiliarios.');
+      }, (error) => {
+        console.log(error.text);
+        toast.error('Hubo un error al enviar su mail.');
+      });
+  };
+
+  return (
+    <section className="contact">
+      <div className="page-top">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <h1 className="page-title">Contacto</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="page-content">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="row mt-5">
+                <form ref={form} onSubmit={sendEmail}>
+                  <div className="col-lg-6">
+                    <label>Nombre y Apellido</label>
+                    <input type="text" name="user_name" className="inp-contact" />
+                  </div>
+                  <div className="col-lg-6">
+                    <label>Teléfono</label>
+                    <input type="text" name="user_phone" className="inp-contact" />
+                  </div>
+                  <div className="col-lg-12">
+                    <label>Asunto</label>
+                    <input type="text" name="subject" className="inp-contact" />
+                  </div>
+                  <div className="col-lg-12">
+                    <label>Mensaje</label>
+                    <textarea name="message" className="ta-contact" rows="4"></textarea>
+                  </div>
+                  <div className="col-lg-12">
+                    <button type="submit" className="btn-contact">Enviar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Toaster />
+    </section>
+  );
+};
+
+export default Contact;
