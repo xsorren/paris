@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const CreateProperty = () => {
@@ -14,6 +14,21 @@ const CreateProperty = () => {
         date: '',
         images: []
     });
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        checkLoginStatus();
+    }, []);
+
+    const checkLoginStatus = async () => {
+        try {
+            const response = await axios.get('https://backend-paris.onrender.com/api/checkSession');
+            setIsLoggedIn(response.data.isLoggedIn);
+        } catch (error) {
+            console.error('Authentication verification failed', error);
+            setIsLoggedIn(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,29 +62,27 @@ const CreateProperty = () => {
         try {
             const response = await axios.post('https://backend-paris.onrender.com/properties', formData);
             alert('Property created successfully!');
-            console.log(response.data); // This can be removed once you confirm it works correctly
+            console.log(response.data);
         } catch (error) {
             console.error('Failed to create property:', error);
             alert('Failed to create property');
         }
     };
 
+    if (!isLoggedIn) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+                <h2>Acceso Inautorizado</h2>
+            </div>
+        );
+    }
+
     return (
         <section className="contact">
-            <div className="page-top">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <h1 className="page-title">Create Property</h1>
-                            <h2 className="page-description">Enter property details below</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="page-content">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12">
+            <div className="container">
+                <div className="row">
+                    <div className="col-lg-12">
+                        <form onSubmit={handleSubmit}>
                             <form onSubmit={handleSubmit}>
                                 <div className="row">
                                     <div className="col-lg-6">
@@ -123,7 +136,7 @@ const CreateProperty = () => {
                                     </div>
                                 </div>
                             </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>

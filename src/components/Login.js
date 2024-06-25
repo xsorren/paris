@@ -5,16 +5,15 @@ import axios from 'axios';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const history = useHistory();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/login', { username, password });
+            const response = await axios.post('https://backend-paris.onrender.com/api/login', { username, password });
             if (response.data.success) {
-                setIsLoggedIn(true);
-                history.push('/createProperty');
+                // Cambiar aquí a la ruta deseada luego del login exitoso
+                history.push('/create');
             } else {
                 alert('Login failed!');
             }
@@ -23,14 +22,6 @@ const Login = () => {
             alert('Login error');
         }
     };
-
-    if (!isLoggedIn) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-                <h2>Acceso Inautorizado</h2>
-            </div>
-        );
-    }
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
