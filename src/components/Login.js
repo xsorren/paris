@@ -10,7 +10,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://backend-paris.onrender.com/api/login', { username, password });
+            const response = await axios.post('https://backend-paris.onrender.com/auth/login', { username, password });
             if (response.data.success) {
                 // Cambiar aquí a la ruta deseada luego del login exitoso
                 history.push('/create');
