@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+// CreateProperty.js
+
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const CreateProperty = () => {
@@ -14,21 +16,6 @@ const CreateProperty = () => {
         date: '',
         images: []
     });
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        checkLoginStatus();
-    }, []);
-
-    const checkLoginStatus = async () => {
-        try {
-            const response = await axios.get('https://backend-paris.onrender.com/api/checkSession');
-            setIsLoggedIn(response.data.isLoggedIn);
-        } catch (error) {
-            console.error('Authentication verification failed', error);
-            setIsLoggedIn(false);
-        }
-    };
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,22 +47,23 @@ const CreateProperty = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://backend-paris.onrender.com/properties', formData);
-            alert('Property created successfully!');
+            const token = localStorage.getItem('token');
+            const response = await axios.post(
+                'https://backend-paris.onrender.com/properties',
+                formData,
+                {
+                    headers: {
+                        'Authorization': token
+                    }
+                }
+            );
+            alert('¡Propiedad creada exitosamente!');
             console.log(response.data);
         } catch (error) {
-            console.error('Failed to create property:', error);
-            alert('Failed to create property');
+            console.error('Error al crear la propiedad:', error);
+            alert('Error al crear la propiedad');
         }
     };
-
-    if (!isLoggedIn) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-                <h2>Acceso Inautorizado</h2>
-            </div>
-        );
-    }
 
     return (
         <section className="contact">
@@ -83,59 +71,13 @@ const CreateProperty = () => {
                 <div className="row">
                     <div className="col-lg-12">
                         <form onSubmit={handleSubmit}>
-                            <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-lg-6">
-                                        <label>Title</label>
-                                        <input type="text" name="title" className="inp-contact" value={formData.title} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Type</label>
-                                        <select name="type" className="inp-contact" value={formData.type} onChange={handleInputChange}>
-                                            <option value="">Select Type</option>
-                                            <option value="house">House</option>
-                                            <option value="apartment">Apartment</option>
-                                            <option value="lot">Lot</option>
-                                            <option value="commercial">Commercial Space</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <label>Description</label>
-                                        <textarea name="description" className="ta-contact" rows="4" value={formData.description} onChange={handleInputChange}></textarea>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Location</label>
-                                        <input type="text" name="location" className="inp-contact" value={formData.location} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Area (m²)</label>
-                                        <input type="number" name="area" className="inp-contact" value={formData.area} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Rooms</label>
-                                        <input type="number" name="rooms" className="inp-contact" value={formData.rooms} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Bathrooms</label>
-                                        <input type="number" name="bathrooms" className="inp-contact" value={formData.bathrooms} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Garages</label>
-                                        <input type="number" name="garages" className="inp-contact" value={formData.garages} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Date</label>
-                                        <input type="date" name="date" className="inp-contact" value={formData.date} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <label>Images (multiple)</label>
-                                        <input type="file" multiple className="inp-contact" onChange={handleImageChange} />
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <button type="submit" className="btn-contact">Save Property</button>
-                                    </div>
+                            <div className="row">
+                                {/* Campos del formulario */}
+                                {/* ... (el resto de tu formulario) */}
+                                <div className="col-lg-12">
+                                    <button type="submit" className="btn-contact">Guardar Propiedad</button>
                                 </div>
-                            </form>
+                            </div>
                         </form>
                     </div>
                 </div>

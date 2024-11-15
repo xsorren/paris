@@ -1,3 +1,5 @@
+// Login.js
+
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
@@ -10,16 +12,20 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://backend-paris.onrender.com/auth/login', { username, password });
+            const response = await axios.post(
+                'https://backend-paris.onrender.com/auth/login',
+                { username, password }
+            );
             if (response.data.success) {
-                // Cambiar aquí a la ruta deseada luego del login exitoso
+                // Almacenar el token en el almacenamiento local
+                localStorage.setItem('token', response.data.token);
                 history.push('/create');
             } else {
-                alert('Login failed!');
+                alert('¡Inicio de sesión fallido!');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            alert('Login error');
+            console.error('Error en el inicio de sesión:', error);
+            alert('Error en el inicio de sesión');
         }
     };
 
@@ -30,17 +36,17 @@ const Login = () => {
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
-                    placeholder="Username"
+                    placeholder="Nombre de usuario"
                     style={{ margin: 5, padding: 10, width: '20%', minWidth: '150px' }}
                 />
                 <input
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     style={{ margin: 5, padding: 10, width: '20%', minWidth: '150px' }}
                 />
-                <button type="submit" style={{ padding: '10px 20px' }}>Login</button>
+                <button type="submit" style={{ padding: '10px 20px' }}>Iniciar Sesión</button>
             </form>
         </div>
     );
