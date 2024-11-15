@@ -17,7 +17,7 @@ const Blog = () => {
         setError(null);
         try {
             const response = await axios.get('https://backend-paris.onrender.com/properties');
-            setPropiedades(response.data);
+            setPropiedades(response.data.properties);
             setLoading(false);
         } catch (err) {
             setError('Error al obtener propiedades');
@@ -78,7 +78,7 @@ const Blog = () => {
                         <p>{error}</p>
                     ) : (
                         <div className="row">
-                            {propiedades.map(property => (
+                            {propiedades && propiedades.map(property => (
                                 <BlogItem key={property._id} property={property} />
                             ))}
                         </div>
