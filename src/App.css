@@ -777,3 +777,28 @@ section {
   display: flex;
   justify-content: center;
 }
+
+/* Estilos para el menú burger */
+.bm-menu {
+  background: #fff;
+  font-size: 1.5em;
+  padding: 2.5em 1.5em;
+  width: 250px;
+}
+
+.bm-item {
+  color: #000;
+  padding: 10px 0;
+  text-decoration: none;
+}
+
+.bm-item:hover {
+  color: #ff6347; /* Color de hover */
+}
+
+.bm-menu-wrap {
+  top: 0;
+  right: 0;
+  z-index: 1000;
+}
+
