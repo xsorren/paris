@@ -8,11 +8,11 @@ const Banner = () => {
     useEffect(() => {
         setSearch(["a","b","test", "mb"])
     }, [])
-    const findSearch = (e) => {
+   /* const findSearch = (e) => {
         setWord(e.target.value)
         const filteredCountries = search.filter(item => item.indexOf(e.target.value) > -1 ? item : null);
         e.target.value.length === 0 ? setFind([]) : setFind(filteredCountries);
-    }
+    }*/
     const findResult = () => {
         if (find.length === 0 && word.length > 0) {
             return <div className="find-search">Not Found</div>

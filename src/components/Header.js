@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { slide as Menu } from "react-burger-menu";
 
 // Estilos con styled-components
 const HeaderWrapper = styled.div`
@@ -49,55 +48,6 @@ const NavbarLink = styled(Link)`
   }
 `;
 
-// Botón del menú hamburguesa
-const BurgerButton = styled.button`
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 100;
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  
-  .bm-burger-bars {
-    background: white; /* El ícono del menú hamburguesa será blanco */
-  }
-`;
-
-// Estilos personalizados para el menú hamburguesa
-const StyledBurgerMenu = styled(Menu)`
-  .bm-menu {
-    background-color: #012161;
-    padding: 2.5em 1.5em 0;
-    font-size: 1.15em;
-    color: white; /* Las letras del menú serán blancas */
-  }
-
-  .bm-item {
-    display: inline-block;
-    margin: 0.5em 0;
-  }
-
-  .bm-item-list {
-    padding: 0;
-  }
-
-  .bm-item a {
-    text-decoration: none;
-    color: white; /* Letras blancas */
-    padding: 10px 15px;
-    display: block;
-  }
-
-  .bm-item a:hover {
-    background-color: #013b88;
-    border-radius: 4px;
-  }
-`;
-
 const Header = () => {
   return (
     <HeaderWrapper>
@@ -108,24 +58,6 @@ const Header = () => {
               <Logo src={"/img/LOGOINMO.png"} alt="Logo" />
             </Link>
           </LogoContainer>
-
-          {/* Botón del menú hamburguesa */}
-          <BurgerButton>
-            <StyledBurgerMenu right>
-              <NavbarItem>
-                <NavbarLink to="/">Inicio</NavbarLink>
-              </NavbarItem>
-              <NavbarItem>
-                <NavbarLink to="/blog">Nuestras Propiedades</NavbarLink>
-              </NavbarItem>
-              <NavbarItem>
-                <NavbarLink to="/about">Sobre Nosotros</NavbarLink>
-              </NavbarItem>
-              <NavbarItem>
-                <NavbarLink to="/contact">Contactos</NavbarLink>
-              </NavbarItem>
-            </StyledBurgerMenu>
-          </BurgerButton>
 
           {/* Menú de navegación en pantallas grandes */}
           <NavbarMenu>

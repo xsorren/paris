@@ -1,25 +1,19 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const history = useHistory();
 
-    const handleLogin = async (e) => {
+    const handleLogin = (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post('https://backend-paris.onrender.com/auth/login', { username, password });
-            if (response.data.success) {
-                // Cambiar aquí a la ruta deseada luego del login exitoso
-                history.push('/create');
-            } else {
-                alert('Login failed!');
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            alert('Login error');
+
+        if (username === "admin" && password === "inmoParis2024!") {
+            localStorage.setItem("isAdmin", "true"); // Guardar estado de admin en localStorage
+            history.push('/admin'); // Redirigir al panel de administración
+        } else {
+            alert("Usuario o contraseña incorrectos.");
         }
     };
 
@@ -30,17 +24,17 @@ const Login = () => {
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
-                    placeholder="Username"
+                    placeholder="Usuario"
                     style={{ margin: 5, padding: 10, width: '20%', minWidth: '150px' }}
                 />
                 <input
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     style={{ margin: 5, padding: 10, width: '20%', minWidth: '150px' }}
                 />
-                <button type="submit" style={{ padding: '10px 20px' }}>Login</button>
+                <button type="submit" style={{ padding: '10px 20px' }}>Ingresar</button>
             </form>
         </div>
     );
