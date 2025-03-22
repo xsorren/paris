@@ -1,40 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs } from '../../firebase/firestore';
-import BlogItem from "./BlogItem";
+import React, { useState, useEffect } from "react";
+import { db } from "../firebase/firebaseConfig"; // Import corregido
+import { collection, getDocs } from "firebase/firestore"; // Import de firestore
+import BlogItem from "../components/BlogItem"; // Import corregido
 
 const Blog = () => {
-    const [propiedades, setPropiedades] = useState([]);
-    const [loading, setLoading] = useState(false);
-    
-    useEffect(() => {
-        fetchProperties();
-    }, []);
+  const [propiedades, setPropiedades] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const fetchProperties = async () => {
-        setLoading(true);
-        try {
-            const querySnapshot = await getDocs(collection(db, "properties"));
-            const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setPropiedades(data);
-        } catch (error) {
-            console.error("Error al obtener propiedades:", error);
-        }
-        setLoading(false);
-    };
+  useEffect(() => {
+    fetchProperties();
+  }, []);
 
-    return (
+  const fetchProperties = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "properties"));
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPropiedades(data);
+    } catch (error) {
+      console.error("Error al obtener propiedades:", error);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h1>Nuestras Propiedades</h1>
+      {loading ? (
+        <p>Cargando...</p>
+      ) : (
         <div>
-            <h1>Nuestras Propiedades</h1>
-            {loading ? <p>Cargando...</p> : (
-                <div>
-                    {propiedades.map((property) => (
-                        <BlogItem key={property.id} property={property} />
-                    ))}
-                </div>
-            )}
+          {propiedades.map((property) => (
+            <BlogItem key={property.id} property={property} />
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default Blog;
