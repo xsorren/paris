@@ -9,14 +9,14 @@ import Blog from "./components/Blog";
 import BlogDetail from "./components/BlogDetail";
 import CreateProperty from "./components/CreateProperty";
 import Login from "./components/Login";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Header />
-        <Routes>
+        <Switch>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<Contact />} />
@@ -25,7 +25,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/flat/:slug" element={<FlatDetail />} />
-        </Routes>
+        </Switch>
         <Footer />
       </div>
     </Router>
