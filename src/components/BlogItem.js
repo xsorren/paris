@@ -6,7 +6,7 @@ const BlogItem = ({ property }) => {
             <div className="blog-item">
                 <div className="blog-img">
                     <img
-                        src={property.images?.[0] || "/img/product1.jpeg"}
+                        src={property.images?.[0] || process.env.REACT_APP_DEFAULT_IMAGE_URL}
                         alt={property.title}
                         className="w-100"
                     />
@@ -21,8 +21,14 @@ const BlogItem = ({ property }) => {
                         </Link>
                     </h2>
                     <div className="blog-info">
-                        <div className="blog-info-item"><i className="far fa-calendar-alt"></i><span>{property.date}</span></div>
-                        <div className="blog-info-item"><i className="far fa-comments"></i><span>0 Comments</span></div>
+                        <div className="blog-info-item">
+                            <i className="far fa-calendar-alt"></i>
+                            <span>{property.date}</span>
+                        </div>
+                        <div className="blog-info-item">
+                            <i className="far fa-comments"></i>
+                            <span>0 Comments</span>
+                        </div>
                     </div>
                     <div className="blog-text">
                         {property.description.substring(0, 100)}...

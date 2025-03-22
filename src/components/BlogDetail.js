@@ -73,9 +73,9 @@ const BlogDetail = () => {
                             ) : (
                                 <CarouselItemCentered>
                                     <CenteredImage
-                                        src="/img/product1.jpeg"
+                                        src={process.env.REACT_APP_DEFAULT_IMAGE_URL}
                                         alt="Imagen predeterminada"
-                                        onClick={() => openModal("/img/product1.jpeg", 0)}
+                                        onClick={() => openModal(process.env.REACT_APP_DEFAULT_IMAGE_URL, 0)}
                                     />
                                 </CarouselItemCentered>
                             )}

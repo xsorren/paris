@@ -20,20 +20,20 @@ const Info = () => {
         <div className="row">
           <div className="col-lg-4">
             <div className="contact-item text-center">
-            <FontAwesomeIcon icon={faUsers} size="2x" />
-              <h5>Tasaciones y Asesoramientos</h5>
+              <FontAwesomeIcon icon={faUsers} size="2x" />
+              <h5>{process.env.REACT_APP_INFO_SERVICE_1}</h5>
             </div>
           </div>
           <div className="col-lg-4">
             <div className="contact-item text-center">
               <FontAwesomeIcon icon={faBuilding} size="2x" />
-              <h5>Casa, Lotes y mas </h5>
+              <h5>{process.env.REACT_APP_INFO_SERVICE_2}</h5>
             </div>
           </div>
           <div className="col-lg-4">
             <div className="contact-item text-center">
               <FontAwesomeIcon icon={faMoneyBillAlt} size="2x" />
-              <h5>El mejor precio para vos</h5>
+              <h5>{process.env.REACT_APP_INFO_SERVICE_3}</h5>
             </div>
           </div>
         </div>

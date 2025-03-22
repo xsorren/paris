@@ -55,7 +55,7 @@ const Header = () => {
         <Navbar className="navbar navbar-expand-lg navbar-light">
           <LogoContainer>
             <Link to="/">
-              <Logo src={"/img/LOGOINMO.png"} alt="Logo" />
+              <Logo src={process.env.REACT_APP_LOGO_URL} alt="Logo" />
             </Link>
           </LogoContainer>
 
@@ -63,16 +63,16 @@ const Header = () => {
           <NavbarMenu>
             <ul className="navbar-nav ms-auto">
               <NavbarItem>
-                <NavbarLink to="/">Inicio</NavbarLink>
+                <NavbarLink to="/">{process.env.REACT_APP_MENU_HOME}</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/blog">Nuestras Propiedades</NavbarLink>
+                <NavbarLink to="/blog">{process.env.REACT_APP_MENU_PROPERTIES}</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/about">Sobre Nosotros</NavbarLink>
+                <NavbarLink to="/about">{process.env.REACT_APP_MENU_ABOUT}</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/contact">Contactos</NavbarLink>
+                <NavbarLink to="/contact">{process.env.REACT_APP_MENU_CONTACT}</NavbarLink>
               </NavbarItem>
             </ul>
           </NavbarMenu>

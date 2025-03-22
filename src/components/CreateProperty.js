@@ -22,7 +22,7 @@ const CreateProperty = () => {
 
     const checkLoginStatus = async () => {
         try {
-            const response = await axios.get('https://backend-paris.onrender.com/api/checkSession');
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/checkSession`);
             setIsLoggedIn(response.data.isLoggedIn);
         } catch (error) {
             console.error('Authentication verification failed', error);
@@ -48,19 +48,15 @@ const CreateProperty = () => {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
-                resolve(fileReader.result);
-            };
-            fileReader.onerror = (error) => {
-                reject(error);
-            };
+            fileReader.onload = () => resolve(fileReader.result);
+            fileReader.onerror = (error) => reject(error);
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://backend-paris.onrender.com/properties', formData);
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/properties`, formData);
             alert('Property created successfully!');
             console.log(response.data);
         } catch (error) {
@@ -83,59 +79,57 @@ const CreateProperty = () => {
                 <div className="row">
                     <div className="col-lg-12">
                         <form onSubmit={handleSubmit}>
-                            <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-lg-6">
-                                        <label>Title</label>
-                                        <input type="text" name="title" className="inp-contact" value={formData.title} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Type</label>
-                                        <select name="type" className="inp-contact" value={formData.type} onChange={handleInputChange}>
-                                            <option value="">Select Type</option>
-                                            <option value="house">House</option>
-                                            <option value="apartment">Apartment</option>
-                                            <option value="lot">Lot</option>
-                                            <option value="commercial">Commercial Space</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <label>Description</label>
-                                        <textarea name="description" className="ta-contact" rows="4" value={formData.description} onChange={handleInputChange}></textarea>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Location</label>
-                                        <input type="text" name="location" className="inp-contact" value={formData.location} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Area (m²)</label>
-                                        <input type="number" name="area" className="inp-contact" value={formData.area} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Rooms</label>
-                                        <input type="number" name="rooms" className="inp-contact" value={formData.rooms} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Bathrooms</label>
-                                        <input type="number" name="bathrooms" className="inp-contact" value={formData.bathrooms} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-4">
-                                        <label>Garages</label>
-                                        <input type="number" name="garages" className="inp-contact" value={formData.garages} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <label>Date</label>
-                                        <input type="date" name="date" className="inp-contact" value={formData.date} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <label>Images (multiple)</label>
-                                        <input type="file" multiple className="inp-contact" onChange={handleImageChange} />
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <button type="submit" className="btn-contact">Save Property</button>
-                                    </div>
+                            <div className="row">
+                                <div className="col-lg-6">
+                                    <label>Title</label>
+                                    <input type="text" name="title" className="inp-contact" value={formData.title} onChange={handleInputChange} />
                                 </div>
-                            </form>
+                                <div className="col-lg-6">
+                                    <label>Type</label>
+                                    <select name="type" className="inp-contact" value={formData.type} onChange={handleInputChange}>
+                                        <option value="">Select Type</option>
+                                        <option value="house">House</option>
+                                        <option value="apartment">Apartment</option>
+                                        <option value="lot">Lot</option>
+                                        <option value="commercial">Commercial Space</option>
+                                    </select>
+                                </div>
+                                <div className="col-lg-12">
+                                    <label>Description</label>
+                                    <textarea name="description" className="ta-contact" rows="4" value={formData.description} onChange={handleInputChange}></textarea>
+                                </div>
+                                <div className="col-lg-6">
+                                    <label>Location</label>
+                                    <input type="text" name="location" className="inp-contact" value={formData.location} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-6">
+                                    <label>Area (m²)</label>
+                                    <input type="number" name="area" className="inp-contact" value={formData.area} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Rooms</label>
+                                    <input type="number" name="rooms" className="inp-contact" value={formData.rooms} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Bathrooms</label>
+                                    <input type="number" name="bathrooms" className="inp-contact" value={formData.bathrooms} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-4">
+                                    <label>Garages</label>
+                                    <input type="number" name="garages" className="inp-contact" value={formData.garages} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-6">
+                                    <label>Date</label>
+                                    <input type="date" name="date" className="inp-contact" value={formData.date} onChange={handleInputChange} />
+                                </div>
+                                <div className="col-lg-12">
+                                    <label>Images (multiple)</label>
+                                    <input type="file" multiple className="inp-contact" onChange={handleImageChange} />
+                                </div>
+                                <div className="col-lg-12">
+                                    <button type="submit" className="btn-contact">Save Property</button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
