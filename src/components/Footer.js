@@ -1,17 +1,19 @@
 import React, { useRef } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserTie, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const Footer = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
+
     const timerRef = useRef(null);
 
     const handleMouseDown = () => {
         timerRef.current = setTimeout(() => {
-            history.push('/login');
-        }, 3000);  // 3 segundos antes de redirigir
+            navigate('/login');
+        }, 3000);
     };
+    
 
     const handleMouseUp = () => {
         clearTimeout(timerRef.current);

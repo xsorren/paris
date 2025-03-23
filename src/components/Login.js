@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleLogin = (e) => {
         e.preventDefault();
 
         if (username === "admin" && password === "inmoParis2024!") {
             localStorage.setItem("isAdmin", "true"); // Guardar estado de admin en localStorage
-            history.push('/admin'); // Redirigir al panel de administración
+            navigate('/admin'); // Redirigir al panel de administración
         } else {
             alert("Usuario o contraseña incorrectos.");
         }
