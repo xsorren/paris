@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+
 // Estilos con styled-components
 const HeaderWrapper = styled.div`
   background-color: #012161;
@@ -28,7 +29,7 @@ const NavbarMenu = styled.div`
   gap: 20px;
 
   @media (max-width: 768px) {
-    display: none; /* Escondemos el menú en pantallas pequeñas cuando usas react-burger-menu */
+    display: none;
   }
 `;
 
@@ -55,24 +56,24 @@ const Header = () => {
         <Navbar className="navbar navbar-expand-lg navbar-light">
           <LogoContainer>
             <Link to="/">
-              <Logo src={process.env.REACT_APP_LOGO_URL} alt="Logo" />
+              <Logo src={'/LOGOINMO.png'} alt="Logo Paris Inmobiliaria" />
             </Link>
           </LogoContainer>
 
-          {/* Menú de navegación en pantallas grandes */}
+          {/* Menú de navegación */}
           <NavbarMenu>
             <ul className="navbar-nav ms-auto">
               <NavbarItem>
-                <NavbarLink to="/">{process.env.REACT_APP_MENU_HOME}</NavbarLink>
+                <NavbarLink to="/">Home</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/blog">{process.env.REACT_APP_MENU_PROPERTIES}</NavbarLink>
+                <NavbarLink to="/blog">Blog</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/about">{process.env.REACT_APP_MENU_ABOUT}</NavbarLink>
+                <NavbarLink to="/about">About</NavbarLink>
               </NavbarItem>
               <NavbarItem>
-                <NavbarLink to="/contact">{process.env.REACT_APP_MENU_CONTACT}</NavbarLink>
+                <NavbarLink to="/contact">Contact</NavbarLink>
               </NavbarItem>
             </ul>
           </NavbarMenu>

@@ -91,6 +91,39 @@ const BlogDetail = () => {
                     <Sidebar />
                 </div>
             </div>
+
+            {/* Modal para mostrar imagen ampliada */}
+            <Modal
+                isOpen={isModalOpen}
+                onRequestClose={closeModal}
+                contentLabel="Vista de Imagen"
+                style={{
+                    overlay: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        zIndex: 1000,
+                    },
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        background: '#fff',
+                        borderRadius: '10px',
+                        padding: '0',
+                        maxWidth: '90%',
+                        maxHeight: '90%',
+                        overflow: 'hidden',
+                    },
+                }}
+            >
+                <img
+                    src={selectedImage}
+                    alt="Vista ampliada"
+                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                />
+            </Modal>
         </Container>
     );
 };

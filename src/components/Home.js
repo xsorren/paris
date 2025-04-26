@@ -1,20 +1,24 @@
-import FlatList from "./FlatList"
-import Banner from "./Banner"
-import React from "react"
-import TeamList from "./TeamList"
-import References from "./References"
-import Subscribe from "./Subscribe"
-import Map from "./Map"
-import Info from "./Info"
+import React from "react";
+import Banner from "./Banner";
+import Info from "./Info";
+import FlatList from "./FlatList";
+import TeamList from "./TeamList";
+import References from "./References";
+import Subscribe from "./Subscribe";
+import Map from "./Map";
 
-const Home=()=>{
+const Home = () => {
     return (
         <React.Fragment>
-            <Banner/>
-            <Info />    
+            <Banner />
+            <Info />
+            <FlatList />
+            <TeamList />
+            <References />
+            <Subscribe />
             <Map />
         </React.Fragment>
-    )
-}
+    );
+};
 
 export default Home;
