@@ -10,8 +10,14 @@ import BlogDetail from "./components/BlogDetail";
 import CreateProperty from "./components/CreateProperty";
 import Login from "./components/Login";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import Modal from "react-modal";
 
 function App() {
+  useEffect(() => {
+    Modal.setAppElement('#root');
+  }, []);
+
   return (
     <Router>
       <div className="App">
