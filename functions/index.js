@@ -1,19 +1,10 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+// src/index.js o src/App.js
+import firebaseApp from './firebase-config';
+// si querés usar Firestore o Auth:
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Ahora podés usar `db` o `auth` en tu app

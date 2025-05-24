@@ -1,9 +1,10 @@
-// Import the functions you need from the SDKs you need
+// src/firebase/firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"; // <-- Importar Firestore
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+//import { getStorage } from "firebase/storage"; // ✅ Agregado
 
-// Tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCucmKYuDTkgOLS5qvnFsWPHaLA5wlvm-o",
   authDomain: "negociosinmobiliarios-paris.firebaseapp.com",
@@ -14,12 +15,11 @@ const firebaseConfig = {
   measurementId: "G-H77KE3GKLV"
 };
 
-// Inicializar Firebase
+// Inicializamos Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
-// Inicializar Firestore
 const db = getFirestore(app);
+const auth = getAuth(app);
+//const storage = getStorage(app); // ✅ Agregado
 
-// Exportar la instancia de Firestore
-export { db };
+export { db, auth }; // ✅ Exportar storage

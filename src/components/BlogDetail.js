@@ -1,131 +1,196 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Carousel } from 'react-bootstrap';
-import Sidebar from "./Sidebar";
-import styled from 'styled-components';
-import Modal from 'react-modal';
-
-// Estilos
-const Container = styled.div`
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-`;
-
-const CustomCarousel = styled(Carousel)`
-    .carousel-inner {
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-`;
-
-const CarouselItemCentered = styled(Carousel.Item)`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px;
-`;
-
-const CenteredImage = styled.img`
-    max-width: 100%;
-    height: auto;
-    object-fit: cover;
-    border-radius: 10px;
-    cursor: pointer;
-`;
-
-Modal.setAppElement('#root');
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 const BlogDetail = () => {
-    const { state } = useLocation();
-    const property = state.property;
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [property, setProperty] = useState(null);
+  const [activeImage, setActiveImage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-    const openModal = (image, index) => {
-        setSelectedImage(image);
-        setCurrentIndex(index);
-        setIsModalOpen(true);
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const docRef = doc(db, "propiedades", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setProperty({ id: docSnap.id, ...data });
+        } else {
+          console.error("No se encontró la propiedad.");
+        }
+      } catch (error) {
+        console.error("Error al obtener la propiedad:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedImage("");
-    };
+    fetchProperty();
+  }, [id]);
 
-    return (
-        <Container className="container">
-            <div className="row">
-                <div className="col-lg-8 order-lg-1">
-                    <div className="blog-detail">
-                        <CustomCarousel interval={5000} indicators={false} controls={true} fade>
-                            {property.images && property.images.length > 0 ? (
-                                property.images.map((image, index) => (
-                                    <CarouselItemCentered key={index}>
-                                        <CenteredImage
-                                            src={image}
-                                            alt={`Imagen ${index + 1}`}
-                                            onClick={() => openModal(image, index)}
-                                        />
-                                    </CarouselItemCentered>
-                                ))
-                            ) : (
-                                <CarouselItemCentered>
-                                    <CenteredImage
-                                        src={process.env.REACT_APP_DEFAULT_IMAGE_URL}
-                                        alt="Imagen predeterminada"
-                                        onClick={() => openModal(process.env.REACT_APP_DEFAULT_IMAGE_URL, 0)}
-                                    />
-                                </CarouselItemCentered>
-                            )}
-                        </CustomCarousel>
+  if (loading) return <p style={styles.center}>Cargando...</p>;
+  if (!property) return <p style={styles.center}>Propiedad no encontrada.</p>;
 
-                        <span className="blog-detail-category">{property.type}</span>
-                        <h1 className="blog-detail-title">{property.title} - {property.location}</h1>
-                        <span className="blog-detail-date">Publicado el {property.date}</span>
-                        <p className="blog-detail-content">{property.description}</p>
-                    </div>
-                </div>
-                <div className="col-lg-4 order-lg-2">
-                    <Sidebar />
-                </div>
-            </div>
+  return (
+    <div style={styles.container}>
+      <h1 style={styles.title}>{property.title}</h1>
 
-            {/* Modal para mostrar imagen ampliada */}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                contentLabel="Vista de Imagen"
+      <button style={styles.backButton} onClick={() => navigate("/blog")}>
+        ← Volver al Blog
+      </button>
+
+      <div style={styles.content}>
+        {/* Carrusel de imágenes */}
+        <div style={styles.carouselSection}>
+          <div style={styles.imageContainer}>
+            <img
+              src={
+                property.images?.[activeImage] ||
+                "https://via.placeholder.com/800x400"
+              }
+              alt="Propiedad"
+              style={styles.mainImage}
+            />
+          </div>
+
+          <div style={styles.thumbnailRow}>
+            {property.images?.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Miniatura ${index + 1}`}
                 style={{
-                    overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        zIndex: 1000,
-                    },
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        background: '#fff',
-                        borderRadius: '10px',
-                        padding: '0',
-                        maxWidth: '90%',
-                        maxHeight: '90%',
-                        overflow: 'hidden',
-                    },
+                  ...styles.thumbnail,
+                  border: index === activeImage ? "2px solid #007BFF" : "1px solid #ccc",
                 }}
-            >
-                <img
-                    src={selectedImage}
-                    alt="Vista ampliada"
-                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-                />
-            </Modal>
-        </Container>
-    );
+                onClick={() => setActiveImage(index)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Panel de contacto */}
+        <div style={styles.contactSection}>
+          <h3 style={styles.contactTitle}>📞 Vías de contacto</h3>
+          <p><strong>📱 Teléfono:</strong> 11 1234 5678</p>
+          <p><strong>📧 Email:</strong> contacto@parisinmobiliaria.com</p>
+          <p><strong>🏢 Dirección:</strong> Av. Principal 123, CABA</p>
+          <a
+            href="https://wa.me/541112345678"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.contactButton}
+          >
+            Contactar por WhatsApp
+          </a>
+        </div>
+      </div>
+
+      {/* Información de la propiedad */}
+      <div style={styles.details}>
+        <p><strong>📍 Ubicación:</strong> {property.location}</p>
+        <p><strong>📐 Metros:</strong> {property.price}</p>
+        <p><strong>📝 Observaciones:</strong> {property.observacion || "Sin observaciones"}</p>
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    padding: "40px 20px",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    fontFamily: "Arial, sans-serif",
+  },
+  title: {
+    fontSize: "32px",
+    marginBottom: "10px",
+    textAlign: "center",
+    color: "#2c3e50",
+  },
+  backButton: {
+    display: "block",
+    margin: "0 auto 30px auto",
+    padding: "10px 20px",
+    backgroundColor: "#007BFF",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    cursor: "pointer",
+  },
+  content: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "30px",
+    justifyContent: "space-between",
+  },
+  carouselSection: {
+    flex: "1 1 65%",
+  },
+  imageContainer: {
+    borderRadius: "10px",
+    overflow: "hidden",
+    marginBottom: "10px",
+  },
+  mainImage: {
+    width: "100%",
+    height: "400px",
+    objectFit: "cover",
+    borderRadius: "10px",
+  },
+  thumbnailRow: {
+    display: "flex",
+    gap: "10px",
+    overflowX: "auto",
+  },
+  thumbnail: {
+    width: "100px",
+    height: "70px",
+    objectFit: "cover",
+    borderRadius: "6px",
+    cursor: "pointer",
+  },
+  contactSection: {
+    flex: "1 1 30%",
+    backgroundColor: "#f8f9fa",
+    padding: "20px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+  },
+  contactTitle: {
+    marginBottom: "15px",
+    color: "#2c3e50",
+    fontSize: "20px",
+  },
+  contactButton: {
+    marginTop: "15px",
+    display: "inline-block",
+    padding: "10px 15px",
+    backgroundColor: "#25D366",
+    color: "white",
+    borderRadius: "5px",
+    textDecoration: "none",
+    fontWeight: "bold",
+  },
+  details: {
+    marginTop: "40px",
+    backgroundColor: "#ffffff",
+    padding: "20px",
+    borderRadius: "10px",
+    fontSize: "18px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+  },
+  center: {
+    textAlign: "center",
+    padding: "50px",
+  },
 };
 
 export default BlogDetail;

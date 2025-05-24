@@ -1,11 +1,78 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserTie, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+
+// Estilos
+const FooterSection = styled.footer`
+  background-color: #012161;
+  color: white;
+  padding: 60px 20px 40px 20px;
+  font-family: 'Segoe UI', sans-serif;
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+`;
+
+const Column = styled.div`
+  flex: 1 1 300px;
+  margin: 20px 0;
+`;
+
+const Title = styled.p`
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 20px;
+`;
+
+const InfoText = styled.span`
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+`;
+
+const SocialIcons = styled.div`
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+`;
+
+const IconBox = styled.div`
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+
+  &:hover {
+    color: #ffc107;
+  }
+`;
+
+const InfoList = styled.ul`
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    i {
+      margin-right: 10px;
+      font-size: 16px;
+    }
+  }
+`;
 
 const Footer = () => {
     const navigate = useNavigate();
-
     const timerRef = useRef(null);
 
     const handleMouseDown = () => {
@@ -13,71 +80,50 @@ const Footer = () => {
             navigate('/login');
         }, 3000);
     };
-    
 
     const handleMouseUp = () => {
         clearTimeout(timerRef.current);
     };
 
     return (
-        <section className="footer">
-            <div className="container">
-                <div className="row" style={{ display: "flex", justifyContent: "space-evenly" }}>
-                    <div className="col-lg-3 col-md-6">
-                        <FontAwesomeIcon icon={faUserTie} size="2x"
-                            onMouseDown={handleMouseDown} 
-                            onMouseUp={handleMouseUp} 
-                            onMouseLeave={handleMouseUp}
-                            style={{ cursor: 'default' }}  // No mostrar el cursor pointer
-                        />
-                        <span className="footer-other-text d-block mt-3 mb-3">
-                            {process.env.REACT_APP_COMPANY_NAME}
-                        </span>
-                        <span className="footer-other-text d-block mt-3 mb-3">
-                            {process.env.REACT_APP_COMPANY_ADVISOR}
-                        </span>
-                        <span className="footer-other-text d-block mt-3 mb-3">
-                            {process.env.REACT_APP_COMPANY_REGISTRATION}
-                        </span>
-                        <div className="footer-social">
-                            <div className="footer-social-item">
-                                <FontAwesomeIcon icon={faEnvelope} size="lg" />
-                            </div>
-                            <div className="footer-social-item">
-                                <i className="fab fa-instagram"></i>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div className="col-lg-3 col-md-6">
-                        <p className="footer-title">Contactos</p>
-                        <ul className="footer-ul">
-                            <li className="d-flex">
-                                <div className="footer-info-item"><i className="fas fa-clock"></i></div> 
-                                <span>Horarios de Atención:</span>
-                            </li>
-                            <li className="d-flex">
-                                <div className="footer-info-item"><i className="fas fa-clock"></i></div> 
-                                <span>{process.env.REACT_APP_COMPANY_WORKING_HOURS}</span>
-                            </li>
-                            <li className="d-flex">
-                                <div style={{ marginRight: 10 }} className="footer-info-item"><i className="fas fa-envelope"></i></div> 
-                                <span>{process.env.REACT_APP_COMPANY_EMAIL}</span>
-                            </li>
-                            <li className="d-flex">
-                                <div className="footer-info-item"><i className="fas fa-map-marker-alt"></i></div> 
-                                <span>{process.env.REACT_APP_COMPANY_ADDRESS}</span>
-                            </li>
-                            <li className="d-flex">
-                                <div className="footer-info-item"><i className="fas fa-phone-alt"></i></div> 
-                                <span>{process.env.REACT_APP_COMPANY_PHONE}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <FooterSection>
+            <Container>
+                <Column>
+                    <FontAwesomeIcon
+                        icon={faUserTie}
+                        size="2x"
+                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        onDoubleClick={() => navigate('/login')} // 👉 nuevo comportamiento
+                        style={{ cursor: 'default' }}
+                    />
+
+                    <InfoText>{process.env.REACT_APP_COMPANY_NAME}</InfoText>
+                    <InfoText>{process.env.REACT_APP_COMPANY_ADVISOR}</InfoText>
+                    <InfoText>{process.env.REACT_APP_COMPANY_REGISTRATION}</InfoText>
+                    <SocialIcons>
+                        <IconBox>
+                            <FontAwesomeIcon icon={faEnvelope} />
+                        </IconBox>
+                        <IconBox>
+                            <FontAwesomeIcon icon={faInstagram} />
+                        </IconBox>
+                    </SocialIcons>
+                </Column>
+
+                <Column>
+                    <Title>Contactos</Title>
+                    <InfoList>
+                        <li><i className="fas fa-clock" /> Horarios de Atención: 08:00 a 12:30 am y 16:00 a 20:00 pm</li>
+                        <li><i className="fas fa-clock" />  Telefono 2227-535057</li>
+                        <li><i className="fas fa-envelope" />Mail: parisnegociosinmobiliarios@gmail.com</li>
+                        <li><i className="fas fa-map-marker-alt" />Nuestra oficina: calle 28 n°917, Navarro, Buenos Aires</li>
+                    </InfoList>
+                </Column>
+            </Container>
+        </FooterSection>
     );
-}
+};
 
 export default Footer;

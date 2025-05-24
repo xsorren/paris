@@ -9,9 +9,10 @@ const Login = () => {
     const handleLogin = (e) => {
         e.preventDefault();
 
-        if (username === "admin" && password === "inmoParis2024!") {
-            localStorage.setItem("isAdmin", "true"); // Guardar estado de admin en localStorage
-            navigate('/admin'); // Redirigir al panel de administración
+        if (username === "admin" && password === "inmoParis2024") {
+            localStorage.setItem("isAdmin", "true");
+            localStorage.setItem("welcomeMessage", "Ahora sos administrador y podés agregar propiedades");
+            navigate('/admin');// Redirigir al panel de administración
         } else {
             alert("Usuario o contraseña incorrectos.");
         }

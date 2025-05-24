@@ -1,5 +1,5 @@
 const About = () => {
-    const imageUrl = "/img/LOGOINMO.jpeg"; // Ajusta la ruta según tu proyecto
+    const imageUrl = "./src/img/logoINMO.jpg"; // Ajusta la ruta según tu proyecto
 
     return (
         <section className="about">

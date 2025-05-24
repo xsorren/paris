@@ -1,80 +1,274 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { uploadImages } from "./uploadService";
+import { useNavigate } from "react-router-dom";
 import { saveProperty } from "./propertyService";
 
 const AdminUpload = () => {
-    const [title, setTitle] = useState("");
-    const [category, setCategory] = useState("casas");
-    const [price, setPrice] = useState("");
-    const [location, setLocation] = useState("");
-    const [images, setImages] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const history = useHistory();
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("casas");
+  const [metros, setMetros] = useState("");
+  const [location, setLocation] = useState("");
+  const [observations, setObservations] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState({ show: false, message: "", success: true });
+  const navigate = useNavigate();
 
-    // 🔒 Verificar si el usuario es administrador
-    useEffect(() => {
-        const isAdmin = localStorage.getItem("isAdmin");
-        if (isAdmin !== "true") {
-            history.push("/login"); // Redirigir si no es admin
-        }
-    }, [history]);
+  useEffect(() => {
+    const isAdmin = localStorage.getItem("isAdmin");
+    if (isAdmin !== "true") {
+      navigate("/login");
+      return;
+    }
 
-    // 🚪 Cerrar sesión
-    const handleLogout = () => {
-        localStorage.removeItem("isAdmin");
-        history.push("/login");
-    };
+    const welcomeMessage = localStorage.getItem("welcomeMessage");
+    if (welcomeMessage) {
+      showModal(welcomeMessage, true);
+      localStorage.removeItem("welcomeMessage");
+    }
+  }, [navigate]);
 
-    // 📤 Subir propiedad
-    const handleUpload = async () => {
-        if (!title || !price || !location || images.length === 0) {
-            alert("Por favor, completa todos los campos.");
-            return;
-        }
+  const showModal = (message, success = true) => {
+    setModal({ show: true, message, success });
+  };
 
-        setLoading(true);
-        try {
-            const propertyData = { title, category, price, location, images: [] };
-            const propertyId = await saveProperty(propertyData);
+  const closeModal = () => {
+    setModal({ show: false, message: "", success: true });
+  };
 
-            const urls = await uploadImages(images, category, propertyId);
-            await saveProperty({ ...propertyData, images: urls });
+  const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    navigate("/login");
+  };
 
-            alert("Propiedad subida con éxito.");
-            setTitle("");
-            setPrice("");
-            setLocation("");
-            setImages([]);
-        } catch (error) {
-            console.error("Error al subir la propiedad:", error);
-            alert("Hubo un error al subir la propiedad.");
-        }
-        setLoading(false);
-    };
+  const handleUpload = async () => {
+    if (!title.trim() || !metros.trim() || !location.trim()) {
+      showModal("Por favor, completá todos los campos obligatorios.", false);
+      return;
+    }
 
-    return (
-        <div style={{ maxWidth: "500px", margin: "auto", padding: "20px", textAlign: "center" }}>
-            <h2>Panel de Administración</h2>
-            <button onClick={handleLogout} style={{ background: "red", color: "white", padding: "10px", marginBottom: "20px", border: "none", cursor: "pointer" }}>
-                Cerrar sesión
+    setLoading(true);
+    try {
+      const propertyData = {
+        title,
+        category,
+        metros,
+        location,
+        observations,
+        images: [],
+      };
+
+      await saveProperty(propertyData);
+      showModal("Propiedad subida con éxito.", true);
+
+      setTitle("");
+      setMetros("");
+      setLocation("");
+      setObservations("");
+    } catch (error) {
+      console.error("Error al subir la propiedad:", error);
+      showModal("Hubo un error al subir la propiedad.", false);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{
+      maxWidth: "520px",
+      margin: "40px auto",
+      padding: "30px 40px",
+      backgroundColor: "#fff",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+      borderRadius: "12px",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      color: "#333",
+      textAlign: "left"
+    }}>
+      <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#004080" }}>
+        🏠 Panel de Administración
+      </h2>
+
+      <p style={{ fontWeight: "600", fontSize: "1.1rem", marginBottom: "12px" }}>Instrucciones:</p>
+      <ul style={{ marginBottom: "25px", lineHeight: "1.6", color: "#555", fontSize: "0.95rem" }}>
+        <li>🖊️ Escribí el <strong>título</strong> de la propiedad.</li>
+        <li>🏷️ Elegí la <strong>categoría</strong>.</li>
+        <li>📐 Ingresá los <strong>metros</strong> del terreno (ejemplo: 120).</li>
+        <li>📍 Indicá la <strong>ubicación</strong> completa.</li>
+        <li>📝 Agregá alguna <strong>observación</strong> si querés.</li>
+        <li>📤 Presioná <strong>“Subir Propiedad”</strong> para guardar.</li>
+      </ul>
+
+      <label style={labelStyle}>Título <span style={{color: "#c00"}}>*</span></label>
+      <input
+        type="text"
+        placeholder="Ej: Casa con 2 plantas y jardín"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        style={inputStyle}
+      />
+
+      <label style={labelStyle}>Categoría</label>
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        style={selectStyle}
+      >
+        <option value="casas">Casas</option>
+        <option value="departamentos">Departamentos</option>
+        <option value="lotes">Lotes</option>
+        <option value="locales">Locales</option>
+      </select>
+
+      <label style={labelStyle}>Metros (m²) <span style={{color: "#c00"}}>*</span></label>
+      <input
+        type="text"
+        placeholder="Ej: 120"
+        value={metros}
+        onChange={(e) => setMetros(e.target.value)}
+        style={inputStyle}
+      />
+
+      <label style={labelStyle}>Ubicación <span style={{color: "#c00"}}>*</span></label>
+      <input
+        type="text"
+        placeholder="Ej: Calle Falsa 123, CABA"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        style={inputStyle}
+      />
+
+      <label style={labelStyle}>Observaciones</label>
+      <textarea
+        placeholder="Detalles adicionales, comentarios, etc."
+        value={observations}
+        onChange={(e) => setObservations(e.target.value)}
+        style={textareaStyle}
+      />
+
+      <button
+        onClick={handleUpload}
+        disabled={loading}
+        style={{
+          ...buttonStyle,
+          backgroundColor: loading ? "#9ccc9c" : "#2e7d32",
+          cursor: loading ? "not-allowed" : "pointer"
+        }}
+      >
+        {loading ? "Subiendo..." : "Subir Propiedad"}
+      </button>
+
+      <button
+        onClick={handleLogout}
+        style={{
+          ...buttonStyle,
+          backgroundColor: "#b71c1c",
+          marginTop: "10px"
+        }}
+      >
+        Cerrar sesión
+      </button>
+
+      {/* Modal */}
+      {modal.show && (
+        <div style={modalBackdropStyle}>
+          <div style={modalContentStyle}>
+            <p style={{ marginBottom: "20px", fontWeight: "600", fontSize: "1.1rem", color: modal.success ? "#2e7d32" : "#b71c1c" }}>
+              {modal.message}
+            </p>
+            <button
+              onClick={closeModal}
+              style={{
+                padding: "10px 25px",
+                backgroundColor: modal.success ? "#2e7d32" : "#b71c1c",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "6px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                transition: "background-color 0.3s ease"
+              }}
+              onMouseOver={e => e.currentTarget.style.backgroundColor = modal.success ? "#27632a" : "#901616"}
+              onMouseOut={e => e.currentTarget.style.backgroundColor = modal.success ? "#2e7d32" : "#b71c1c"}
+            >
+              Cerrar
             </button>
-            
-            <input type="text" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="casas">Casas</option>
-                <option value="departamentos">Departamentos</option>
-                <option value="lotes">Lotes</option>
-                <option value="locales">Locales</option>
-            </select>
-            <input type="number" placeholder="Precio" value={price} onChange={(e) => setPrice(e.target.value)} />
-            <input type="text" placeholder="Ubicación" value={location} onChange={(e) => setLocation(e.target.value)} />
-            <input type="file" multiple onChange={(e) => setImages([...e.target.files])} />
-            <button onClick={handleUpload} disabled={loading}>
-                {loading ? "Subiendo..." : "Subir Propiedad"}
-            </button>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
+};
+
+// Estilos reutilizables
+const labelStyle = {
+  display: "block",
+  fontWeight: "600",
+  marginBottom: "6px",
+  marginTop: "12px",
+  color: "#004080",
+  fontSize: "0.95rem",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "10px 14px",
+  fontSize: "1rem",
+  borderRadius: "6px",
+  border: "1.5px solid #ccc",
+  outlineColor: "#004080",
+  boxSizing: "border-box",
+  transition: "border-color 0.3s ease",
+};
+
+const selectStyle = {
+  ...inputStyle,
+  appearance: "none",
+  backgroundColor: "#fff",
+  cursor: "pointer",
+};
+
+const textareaStyle = {
+  width: "100%",
+  minHeight: "80px",
+  padding: "10px 14px",
+  fontSize: "1rem",
+  borderRadius: "6px",
+  border: "1.5px solid #ccc",
+  outlineColor: "#004080",
+  resize: "vertical",
+  boxSizing: "border-box",
+  transition: "border-color 0.3s ease",
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: "12px",
+  fontSize: "1.1rem",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "700",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  transition: "background-color 0.3s ease",
+};
+
+const modalBackdropStyle = {
+  position: "fixed",
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.45)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 9999
+};
+
+const modalContentStyle = {
+  backgroundColor: "#fff",
+  borderRadius: "14px",
+  padding: "30px 35px",
+  maxWidth: "400px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.15)"
 };
 
 export default AdminUpload;
