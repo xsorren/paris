@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-// Colores sobrios y elegantes para inmobiliaria
+// Estilos para el encabezado
 const HeaderWrapper = styled.header`
-  background-color: #0b1f44;  // Azul oscuro elegante
+  background-color: #0b1f44; // Azul oscuro
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   padding: 15px 0;
   position: sticky;
@@ -26,9 +26,19 @@ const LogoContainer = styled.div`
 `;
 
 const Logo = styled.img`
-  max-height: 60px;
-  filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
+  height: 100px;
+  width: auto;
+  max-width: 150px; /* o ajustá según lo que necesites */
+  object-fit: contain;
+  filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5));
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    height: 70px;
+    max-width: 180px;
+  }
 `;
+
 
 const NavbarMenu = styled.ul`
   display: flex;
@@ -67,7 +77,6 @@ const NavbarLink = styled(Link)`
   }
 `;
 
-// Botón hamburguesa para menú móvil
 const Hamburger = styled.div`
   display: none;
   flex-direction: column;
@@ -97,7 +106,7 @@ const Header = () => {
       <Container>
         <LogoContainer>
           <Link to="/" onClick={() => setMenuOpen(false)}>
-            <Logo src="/logoINMO.jpg" alt="Logo Paris Inmobiliaria" />
+          <Logo src="/logoINMOsinFondo.png" alt="Logo Paris Inmobiliaria" />
           </Link>
         </LogoContainer>
 
