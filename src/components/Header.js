@@ -13,29 +13,24 @@ const HeaderWrapper = styled.header`
 `;
 
 const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 24px 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-const LogoContainer = styled.div`
-  cursor: pointer;
-`;
+
 
 const Logo = styled.img`
-  height: 100px;
-  width: auto;
-  max-width: 150px; /* o ajustá según lo que necesites */
+  height: 115px;
+  width: 700px; // Ajustá a tu gusto
   object-fit: contain;
   filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5));
   transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     height: 70px;
-    max-width: 180px;
+    width: 160px;
   }
 `;
 
@@ -66,7 +61,7 @@ const NavbarLink = styled(Link)`
   text-decoration: none;
   color: #f0f0f0;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   padding: 8px 12px;
   border-radius: 6px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -104,11 +99,8 @@ const Header = () => {
   return (
     <HeaderWrapper>
       <Container>
-        <LogoContainer>
-          <Link to="/" onClick={() => setMenuOpen(false)}>
-          <Logo src="/logoINMOsinFondo.png" alt="Logo Paris Inmobiliaria" />
-          </Link>
-        </LogoContainer>
+          <Logo src="/imageLogo.png" alt="Logo Paris Inmobiliaria" />
+       
 
         <Hamburger onClick={toggleMenu} aria-label="Toggle menu">
           <span style={{ transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />

@@ -9,8 +9,9 @@ import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 const FooterSection = styled.footer`
   background-color: #012161;
   color: white;
-  padding: 60px 20px 40px 20px;
+  padding: 40px 20px;
   font-family: 'Segoe UI', sans-serif;
+  width: 100%;
 `;
 
 const Container = styled.div`
@@ -19,35 +20,42 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 40px;
 `;
 
 const Column = styled.div`
   flex: 1 1 300px;
-  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `;
 
-const Title = styled.p`
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 20px;
+const Title = styled.h4`
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #ffc107;
+  border-bottom: 2px solid #ffc107;
+  padding-bottom: 5px;
+  width: fit-content;
 `;
 
 const InfoText = styled.span`
-  display: block;
-  margin-bottom: 10px;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #f0f0f0;
 `;
 
 const SocialIcons = styled.div`
   display: flex;
   gap: 15px;
-  margin-top: 15px;
+  margin-top: 10px;
 `;
 
-const IconBox = styled.div`
+const IconBox = styled.a`
   font-size: 20px;
-  cursor: pointer;
   color: white;
+  transition: color 0.3s;
 
   &:hover {
     color: #ffc107;
@@ -57,73 +65,76 @@ const IconBox = styled.div`
 const InfoList = styled.ul`
   list-style: none;
   padding: 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 15px;
+  color: #f0f0f0;
 
   li {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-
-    i {
-      margin-right: 10px;
-      font-size: 16px;
-    }
+    gap: 10px;
+    margin-bottom: 8px;
+    line-height: 1.5;
   }
 `;
 
 const Footer = () => {
-    const navigate = useNavigate();
-    const timerRef = useRef(null);
+  const navigate = useNavigate();
+  const timerRef = useRef(null);
 
-    const handleMouseDown = () => {
-        timerRef.current = setTimeout(() => {
-            navigate('/login');
-        }, 3000);
-    };
+  const handleMouseDown = () => {
+    timerRef.current = setTimeout(() => {
+      navigate('/login');
+    }, 3000);
+  };
 
-    const handleMouseUp = () => {
-        clearTimeout(timerRef.current);
-    };
+  const handleMouseUp = () => {
+    clearTimeout(timerRef.current);
+  };
 
-    return (
-        <FooterSection>
-            <Container>
-                <Column>
-                    <FontAwesomeIcon
-                        icon={faUserTie}
-                        size="2x"
-                        onMouseDown={handleMouseDown}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseUp}
-                        onDoubleClick={() => navigate('/login')} // 👉 nuevo comportamiento
-                        style={{ cursor: 'default' }}
-                    />
+  return (
+    <FooterSection>
+      <Container>
+        <Column>
+          <Title>Sobre Nosotros</Title>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+            <FontAwesomeIcon
+              icon={faUserTie}
+              size="2x"
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onDoubleClick={() => navigate('/login')}
+              style={{ cursor: 'default', color: '#ffc107', marginTop: '4px' }}
+            />
+            <InfoList>
+              <li><i className="fas fa-user" /> Claudio Paris</li>
+              <li><i className="fas fa-briefcase" /> Asesor Inmobiliario</li>
+              <li><i className="fas fa-id-badge" /> Coleg. N° 4058 T°IX F°4058 - CMCPDJ Mercedes</li>
+            </InfoList>
+          </div>
+          <SocialIcons>
+            <IconBox href="mailto:parisnegociosinmobiliarios@gmail.com" title="Enviar mail">
+              <FontAwesomeIcon icon={faEnvelope} />
+            </IconBox>
+            <IconBox href="https://instagram.com" target="_blank" title="Instagram">
+              <FontAwesomeIcon icon={faInstagram} />
+            </IconBox>
+          </SocialIcons>
+        </Column>
 
-                    <InfoText>{process.env.REACT_APP_COMPANY_NAME}</InfoText>
-                    <InfoText>{process.env.REACT_APP_COMPANY_ADVISOR}</InfoText>
-                    <InfoText>{process.env.REACT_APP_COMPANY_REGISTRATION}</InfoText>
-                    <SocialIcons>
-                        <IconBox>
-                            <FontAwesomeIcon icon={faEnvelope} />
-                        </IconBox>
-                        <IconBox>
-                            <FontAwesomeIcon icon={faInstagram} />
-                        </IconBox>
-                    </SocialIcons>
-                </Column>
-
-                <Column>
-                    <Title>Contactos</Title>
-                    <InfoList>
-                        <li><i className="fas fa-clock" /> Horarios de Atención: 08:00 a 12:30 am y 16:00 a 20:00 pm</li>
-                        <li><i className="fas fa-clock" />  Telefono 2227-535057</li>
-                        <li><i className="fas fa-envelope" />Mail: parisnegociosinmobiliarios@gmail.com</li>
-                        <li><i className="fas fa-map-marker-alt" />Nuestra oficina: calle 28 n°917, Navarro, Buenos Aires</li>
-                    </InfoList>
-                </Column>
-            </Container>
-        </FooterSection>
-    );
+        <Column>
+          <Title>Contacto</Title>
+          <InfoList>
+            <li><i className="fas fa-clock" /> Horarios: 08:00–12:30 / 16:00–20:00</li>
+            <li><i className="fas fa-phone" /> Teléfono: 2227-535057</li>
+            <li><i className="fas fa-envelope" /> Email: parisnegociosinmobiliarios@gmail.com</li>
+            <li><i className="fas fa-map-marker-alt" /> Oficina: Calle 28 Nº917, Navarro, Buenos Aires</li>
+          </InfoList>
+        </Column>
+      </Container>
+    </FooterSection>
+  );
 };
 
 export default Footer;

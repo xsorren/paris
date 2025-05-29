@@ -5,7 +5,9 @@ import { Link } from "react-router-dom";
 
 const Blog = () => {
   const [propiedades, setPropiedades] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filtroActivo, setFiltroActivo] = useState("todas");
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -16,6 +18,7 @@ const Blog = () => {
           ...doc.data(),
         }));
         setPropiedades(data);
+        setFiltered(data); // inicial
       } catch (err) {
         console.error("Error al obtener propiedades:", err);
       } finally {
@@ -26,14 +29,48 @@ const Blog = () => {
     fetchProperties();
   }, []);
 
+ const filtrarPorTipo = (tipo) => {
+  setFiltroActivo(tipo);
+  if (tipo === "todas") {
+    setFiltered(propiedades);
+  } else {
+    const filtradas = propiedades.filter(
+      (prop) => prop.category?.toLowerCase() === tipo.toLowerCase()
+    );
+    setFiltered(filtradas);
+  }
+};
+
+
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>🏡 Propiedades Disponibles</h1>
+      <h1 style={styles.title}>
+  <span style={styles.highlight}>Propiedades</span> disponibles
+</h1>
+<div style={styles.separator}></div>
+
+
+      <div style={styles.filterButtons}>
+        {["todas", "casa", "departamento", "lote"].map((tipo) => (
+        <button
+    key={tipo}
+    style={{
+      ...styles.filterButton,
+      backgroundColor: filtroActivo === tipo ? "#184a8e" : "#ddd",
+      color: filtroActivo === tipo ? "#fff" : "#333",
+    }}
+    onClick={() => filtrarPorTipo(tipo)}
+  >
+    {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+  </button>
+        ))}
+      </div>
+
       {loading ? (
         <p style={styles.loading}>Cargando propiedades...</p>
       ) : (
         <div style={styles.grid}>
-          {propiedades.map((property) => (
+          {filtered.map((property) => (
             <div key={property.id} style={styles.card}>
               <img
                 src={property.images?.[0] || "https://via.placeholder.com/400x300"}
@@ -73,11 +110,41 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     backgroundColor: "#f9f9f9",
   },
-  title: {
-    textAlign: "center",
-    marginBottom: "40px",
-    fontSize: "32px",
-    color: "#333",
+ title: {
+  textAlign: "center",
+  marginBottom: "10px",
+  fontSize: "38px",
+  fontWeight: "700",
+  color: "#0b1f44",
+  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  letterSpacing: "1px",
+},
+
+highlight: {
+  color: "#184a8e",
+},
+
+separator: {
+  width: "80px",
+  height: "4px",
+  backgroundColor: "#184a8e",
+  margin: "10px auto 30px",
+  borderRadius: "2px",
+},
+
+  filterButtons: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginBottom: "30px",
+  },
+  filterButton: {
+    padding: "10px 20px",
+    fontSize: "16px",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
   },
   loading: {
     textAlign: "center",

@@ -4,7 +4,7 @@ import { saveProperty } from "./propertyService";
 
 const AdminUpload = () => {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("casas");
+  const [category, setCategory] = useState("casa");
   const [metros, setMetros] = useState("");
   const [location, setLocation] = useState("");
   const [observations, setObservations] = useState("");
@@ -111,10 +111,10 @@ const AdminUpload = () => {
         onChange={(e) => setCategory(e.target.value)}
         style={selectStyle}
       >
-        <option value="casas">Casas</option>
-        <option value="departamentos">Departamentos</option>
-        <option value="lotes">Lotes</option>
-        <option value="locales">Locales</option>
+        <option value="casa">Casas</option>
+        <option value="departamento">Departamentos</option>
+        <option value="lote">Lotes</option>
+        <option value="local">Locales</option>
       </select>
 
       <label style={labelStyle}>Metros (m²) <span style={{color: "#c00"}}>*</span></label>
