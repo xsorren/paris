@@ -2,7 +2,7 @@ const Contact = () => {
     return (
         <section style={styles.section}>
             <div style={styles.pageTop}>
-                <h1 style={styles.pageTitle}>Contacto</h1>
+                <h1 style={styles.pagetitle}>Contacto</h1>
             </div>
 
             <div style={styles.container}>
@@ -60,7 +60,7 @@ const styles = {
         textAlign: "center",
         marginBottom: "40px",
     },
-    pageTitle: {
+    pagetitle: {
         fontSize: "36px",
         color: "#333",
         margin: 0,
@@ -126,7 +126,7 @@ const styles = {
     },
     button: {
         marginTop: "20px",
-        backgroundColor: "#2a6ebd",
+        backgroundColor: "#012161",
         color: "white",
         padding: "12px 20px",
         border: "none",

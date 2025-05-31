@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { saveProperty } from "./propertyService";
 
 const AdminUpload = () => {
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("casa");
+  const [titulo, setTitulo] = useState("");
+  const [categoria, setCategoria] = useState("casa");
+  const [operacion, setOperacion] = useState("venta");
   const [metros, setMetros] = useState("");
-  const [location, setLocation] = useState("");
-  const [observations, setObservations] = useState("");
+  const [localidad, setLocalidad] = useState("");
+  const [observacion, setObservacion] = useState("");
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true });
   const navigate = useNavigate();
@@ -39,36 +40,46 @@ const AdminUpload = () => {
     navigate("/login");
   };
 
-  const handleUpload = async () => {
-    if (!title.trim() || !metros.trim() || !location.trim()) {
-      showModal("Por favor, completá todos los campos obligatorios.", false);
-      return;
-    }
+const handleUpload = async () => {
+  const errores = [];
 
-    setLoading(true);
-    try {
-      const propertyData = {
-        title,
-        category,
-        metros,
-        location,
-        observations,
-        images: [],
-      };
+  if (!titulo.trim()) errores.push("el título");
+  if (!metros.trim()) errores.push("los metros");
+  if (!localidad.trim()) errores.push("la ubicación");
 
-      await saveProperty(propertyData);
-      showModal("Propiedad subida con éxito.", true);
+  if (errores.length > 0) {
+    const mensaje = `Por favor, completá ${errores.join(", ")}.`;
+    showModal(mensaje, false);
+    return;
+  }
 
-      setTitle("");
-      setMetros("");
-      setLocation("");
-      setObservations("");
-    } catch (error) {
-      console.error("Error al subir la propiedad:", error);
-      showModal("Hubo un error al subir la propiedad.", false);
-    }
-    setLoading(false);
-  };
+  setLoading(true);
+  try {
+    const propertyData = {
+      titulo,
+      categoria,
+      metros,
+      localidad,
+      observacion,
+      operacion,
+      images: [],
+    };
+
+    await saveProperty(propertyData);
+    showModal("Propiedad subida con éxito.", true);
+
+    setTitulo("");
+    setMetros("");
+    setLocalidad("");
+    setObservacion("");
+    setOperacion("venta");
+  } catch (error) {
+    console.error("Error al subir la propiedad:", error);
+    showModal("Hubo un error al guardar la propiedad. Intentá nuevamente.", false);
+  }
+  setLoading(false);
+};
+
 
   return (
     <div style={{
@@ -83,32 +94,33 @@ const AdminUpload = () => {
       textAlign: "left"
     }}>
       <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#004080" }}>
-        🏠 Panel de Administración
+        Panel de Administración
       </h2>
 
       <p style={{ fontWeight: "600", fontSize: "1.1rem", marginBottom: "12px" }}>Instrucciones:</p>
       <ul style={{ marginBottom: "25px", lineHeight: "1.6", color: "#555", fontSize: "0.95rem" }}>
         <li>🖊️ Escribí el <strong>título</strong> de la propiedad.</li>
         <li>🏷️ Elegí la <strong>categoría</strong>.</li>
+        <li>🏷️ Elegí la <strong>operacion</strong>.</li>
         <li>📐 Ingresá los <strong>metros</strong> del terreno (ejemplo: 120).</li>
         <li>📍 Indicá la <strong>ubicación</strong> completa.</li>
         <li>📝 Agregá alguna <strong>observación</strong> si querés.</li>
         <li>📤 Presioná <strong>“Subir Propiedad”</strong> para guardar.</li>
       </ul>
 
-      <label style={labelStyle}>Título <span style={{color: "#c00"}}>*</span></label>
+      <label style={labelStyle}>Título <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Casa con 2 plantas y jardín"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
         style={inputStyle}
       />
 
       <label style={labelStyle}>Categoría</label>
       <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
+        value={categoria}
+        onChange={(e) => setCategoria(e.target.value)}
         style={selectStyle}
       >
         <option value="casa">Casas</option>
@@ -116,8 +128,17 @@ const AdminUpload = () => {
         <option value="lote">Lotes</option>
         <option value="local">Locales</option>
       </select>
+      <label style={labelStyle}>Tipo de operación</label>
+      <select
+        value={operacion}
+        onChange={(e) => setOperacion(e.target.value)}
+        style={selectStyle}
+      >
+        <option value="venta">Venta</option>
+        <option value="alquiler">Alquiler</option>
+      </select>
 
-      <label style={labelStyle}>Metros (m²) <span style={{color: "#c00"}}>*</span></label>
+      <label style={labelStyle}>Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: 120"
@@ -126,20 +147,20 @@ const AdminUpload = () => {
         style={inputStyle}
       />
 
-      <label style={labelStyle}>Ubicación <span style={{color: "#c00"}}>*</span></label>
+      <label style={labelStyle}>Ubicación <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Calle Falsa 123, CABA"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        value={localidad}
+        onChange={(e) => setLocalidad(e.target.value)}
         style={inputStyle}
       />
 
       <label style={labelStyle}>Observaciones</label>
       <textarea
         placeholder="Detalles adicionales, comentarios, etc."
-        value={observations}
-        onChange={(e) => setObservations(e.target.value)}
+        value={observacion}
+        onChange={(e) => setObservacion(e.target.value)}
         style={textareaStyle}
       />
 
@@ -153,17 +174,6 @@ const AdminUpload = () => {
         }}
       >
         {loading ? "Subiendo..." : "Subir Propiedad"}
-      </button>
-
-      <button
-        onClick={handleLogout}
-        style={{
-          ...buttonStyle,
-          backgroundColor: "#b71c1c",
-          marginTop: "10px"
-        }}
-      >
-        Cerrar sesión
       </button>
 
       {/* Modal */}

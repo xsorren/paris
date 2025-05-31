@@ -81,7 +81,7 @@ const CreateProperty = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="row">
                                 <div className="col-lg-6">
-                                    <label>Title</label>
+                                    <label>title</label>
                                     <input type="text" name="title" className="inp-contact" value={formData.title} onChange={handleInputChange} />
                                 </div>
                                 <div className="col-lg-6">

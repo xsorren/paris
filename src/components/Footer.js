@@ -30,7 +30,7 @@ const Column = styled.div`
   gap: 16px;
 `;
 
-const Title = styled.h4`
+const title = styled.h4`
   font-weight: 700;
   font-size: 22px;
   margin-bottom: 8px;
@@ -96,7 +96,7 @@ const Footer = () => {
     <FooterSection>
       <Container>
         <Column>
-          <Title>Sobre Nosotros</Title>
+          <title>Sobre Nosotros</title>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
             <FontAwesomeIcon
               icon={faUserTie}
@@ -117,14 +117,14 @@ const Footer = () => {
             <IconBox href="mailto:parisnegociosinmobiliarios@gmail.com" title="Enviar mail">
               <FontAwesomeIcon icon={faEnvelope} />
             </IconBox>
-            <IconBox href="https://instagram.com" target="_blank" title="Instagram">
+            <IconBox href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" title="Instagram">
               <FontAwesomeIcon icon={faInstagram} />
             </IconBox>
           </SocialIcons>
         </Column>
 
         <Column>
-          <Title>Contacto</Title>
+          <title>Contacto</title>
           <InfoList>
             <li><i className="fas fa-clock" /> Horarios: 08:00–12:30 / 16:00–20:00</li>
             <li><i className="fas fa-phone" /> Teléfono: 2227-535057</li>

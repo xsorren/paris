@@ -1,4 +1,4 @@
-const Title = (props) => {
+const title = (props) => {
     const {title,description}=props
     return (
         <div className="row">
@@ -12,4 +12,4 @@ const Title = (props) => {
     )
 }
 
-export default Title
+export default title

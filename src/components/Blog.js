@@ -18,7 +18,7 @@ const Blog = () => {
           ...doc.data(),
         }));
         setPropiedades(data);
-        setFiltered(data); // inicial
+        setFiltered(data);
       } catch (err) {
         console.error("Error al obtener propiedades:", err);
       } finally {
@@ -29,41 +29,69 @@ const Blog = () => {
     fetchProperties();
   }, []);
 
- const filtrarPorTipo = (tipo) => {
-  setFiltroActivo(tipo);
-  if (tipo === "todas") {
-    setFiltered(propiedades);
-  } else {
+  const filtrarPorTipo = (tipo) => {
+    setFiltroActivo(tipo);
+    if (tipo === "todas") {
+      setFiltered(propiedades);
+    } else {
+      const filtradas = propiedades.filter(
+        (prop) => prop.categoria?.toLowerCase() === tipo.toLowerCase()
+      );
+      setFiltered(filtradas);
+    }
+  };
+
+  const filtrarPorOperacion = (tipoOperacion) => {
+    setFiltroActivo(tipoOperacion);
     const filtradas = propiedades.filter(
-      (prop) => prop.category?.toLowerCase() === tipo.toLowerCase()
+      (prop) => prop.operacion?.toLowerCase() === tipoOperacion.toLowerCase()
     );
     setFiltered(filtradas);
-  }
-};
-
+  };
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>
-  <span style={styles.highlight}>Propiedades</span> disponibles
-</h1>
-<div style={styles.separator}></div>
-
+        <span style={styles.highlight}>Propiedades</span> disponibles
+      </h1>
+      <div style={styles.separator}></div>
 
       <div style={styles.filterButtons}>
         {["todas", "casa", "departamento", "lote"].map((tipo) => (
-        <button
-    key={tipo}
-    style={{
-      ...styles.filterButton,
-      backgroundColor: filtroActivo === tipo ? "#184a8e" : "#ddd",
-      color: filtroActivo === tipo ? "#fff" : "#333",
-    }}
-    onClick={() => filtrarPorTipo(tipo)}
-  >
-    {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-  </button>
+          <button
+            key={tipo}
+            style={{
+              ...styles.filterButton,
+              backgroundColor: filtroActivo === tipo ? "#184a8e" : "#ddd",
+              color: filtroActivo === tipo ? "#fff" : "#333",
+            }}
+            onClick={() => filtrarPorTipo(tipo)}
+          >
+            {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+          </button>
         ))}
+
+        <button
+          style={{
+            ...styles.filterButton,
+            backgroundColor: filtroActivo === "venta" ? "#184a8e" : "#ddd",
+            color: filtroActivo === "venta" ? "#fff" : "#333",
+          }}
+          onClick={() => filtrarPorOperacion("venta")}
+        >
+          En Venta
+        </button>
+
+        <button
+          style={{
+            ...styles.filterButton,
+            backgroundColor: filtroActivo === "alquiler" ? "#184a8e" : "#ddd",
+            color: filtroActivo === "alquiler" ? "#fff" : "#333",
+          }}
+          onClick={() => filtrarPorOperacion("alquiler")}
+        >
+          En Alquiler
+        </button>
       </div>
 
       {loading ? (
@@ -74,22 +102,18 @@ const Blog = () => {
             <div key={property.id} style={styles.card}>
               <img
                 src={property.images?.[0] || "https://via.placeholder.com/400x300"}
-                alt={property.title}
+                alt={property.titulo}
                 style={styles.image}
               />
               <div style={styles.content}>
-                <h3 style={styles.propertyTitle}>
+                <h3 style={styles.propertytitle}>
                   <Link to={`/blog/${property.id}`} style={styles.link}>
-                    {property.title}
+                    {property.titulo}
                   </Link>
                 </h3>
-                <p><strong>📍 Ubicación:</strong> {property.location}</p>
-                <p><strong>📐 Metros:</strong> {property.price}</p>
-                <p style={styles.description}>
-                  {property.observacion
-                    ? property.observacion.substring(0, 100) + "..."
-                    : "Sin observaciones"}
-                </p>
+                <p><strong>Título:</strong> {property.titulo}</p>
+                <p><strong>Ubicación:</strong> {property.localidad}</p>
+                <p><strong>Metros:</strong> {property.metros}</p>
                 <Link to={`/blog/${property.id}`} style={styles.button}>
                   Ver Detalles
                 </Link>
@@ -105,35 +129,33 @@ const Blog = () => {
 const styles = {
   container: {
     padding: "40px 20px",
-    maxWidth: "1200px",
+    maxWidth: "2000px",
     margin: "0 auto",
     fontFamily: "Arial, sans-serif",
     backgroundColor: "#f9f9f9",
   },
- title: {
-  textAlign: "center",
-  marginBottom: "10px",
-  fontSize: "38px",
-  fontWeight: "700",
-  color: "#0b1f44",
-  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  letterSpacing: "1px",
-},
-
-highlight: {
-  color: "#184a8e",
-},
-
-separator: {
-  width: "80px",
-  height: "4px",
-  backgroundColor: "#184a8e",
-  margin: "10px auto 30px",
-  borderRadius: "2px",
-},
-
+  title: {
+    textAlign: "center",
+    marginBottom: "10px",
+    fontSize: "38px",
+    fontWeight: "700",
+    color: "#0b1f44",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    letterSpacing: "1px",
+  },
+  highlight: {
+    color: "#184a8e",
+  },
+  separator: {
+    width: "80px",
+    height: "4px",
+    backgroundColor: "#184a8e",
+    margin: "10px auto 30px",
+    borderRadius: "2px",
+  },
   filterButtons: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "center",
     gap: "15px",
     marginBottom: "30px",
@@ -170,7 +192,7 @@ separator: {
   content: {
     padding: "20px",
   },
-  propertyTitle: {
+  propertytitle: {
     fontSize: "20px",
     marginBottom: "10px",
     color: "#2c3e50",
@@ -188,7 +210,7 @@ separator: {
     display: "inline-block",
     marginTop: "15px",
     padding: "10px 16px",
-    backgroundColor: "#0066cc",
+    backgroundColor: "#012161",
     color: "#fff",
     textDecoration: "none",
     borderRadius: "5px",

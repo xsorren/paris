@@ -42,6 +42,9 @@ const BlogDetail = () => {
       <button style={styles.backButton} onClick={() => navigate("/blog")}>
         ← Volver al Blog
       </button>
+      {/* Título centrado arriba */}
+      <h1 style={styles.title}>{property.titulo}</h1>
+      <div style={styles.titleUnderline}></div>
 
       <div style={styles.content}>
         {/* Carrusel de imágenes */}
@@ -75,12 +78,12 @@ const BlogDetail = () => {
 
         {/* Panel de contacto */}
         <div style={styles.contactSection}>
-          <h3 style={styles.contactTitle}>📞 Vías de contacto</h3>
-          <p><strong>📱 Teléfono:</strong> 11 1234 5678</p>
-          <p><strong>📧 Email:</strong> contacto@parisinmobiliaria.com</p>
-          <p><strong>🏢 Dirección:</strong> Av. Principal 123, CABA</p>
+          <h3 style={styles.contacttitle}>📞 Vías de contacto</h3>
+          <p><strong>📱 Teléfono:</strong> 2227-535057</p>
+          <p><strong>📧 Email:</strong> parisnegociosinmobiliarios@gmail.com</p>
+          <p><strong>🏢 Oficina:</strong> Calle 28 Nº917, Navarro, Buenos Aires</p>
           <a
-            href="https://wa.me/541112345678"
+            href="https://wa.me/2227-535057"
             target="_blank"
             rel="noopener noreferrer"
             style={styles.contactButton}
@@ -92,8 +95,8 @@ const BlogDetail = () => {
 
       {/* Información de la propiedad */}
       <div style={styles.details}>
-        <p><strong>📍 Ubicación:</strong> {property.location}</p>
-        <p><strong>📐 Metros:</strong> {property.price}</p>
+        <p><strong>📍 Ubicación:</strong> {property.localidad}</p>
+        <p><strong>📐 Metros:</strong> {property.metros}</p>
         <p><strong>📝 Observaciones:</strong> {property.observacion || "Sin observaciones"}</p>
       </div>
     </div>
@@ -103,21 +106,36 @@ const BlogDetail = () => {
 const styles = {
   container: {
     padding: "40px 20px",
-    maxWidth: "1200px",
+    maxWidth: "2000px",
     margin: "0 auto",
     fontFamily: "Arial, sans-serif",
   },
   title: {
-    fontSize: "32px",
-    marginBottom: "10px",
     textAlign: "center",
-    color: "#2c3e50",
+    fontSize: "42px",
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: "30px",
+    textTransform: "uppercase",
+    letterSpacing: "1.5px",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    position: "relative",
   },
+
+  // Agregá este nuevo estilo para la línea decorativa opcional debajo del título (usado con un <div>)
+  titleUnderline: {
+    width: "80px",
+    height: "4px",
+    backgroundColor: "#184a8e",
+    margin: "0 auto 40px auto",
+    borderRadius: "2px",
+  },
+
   backButton: {
     display: "block",
     margin: "0 auto 30px auto",
     padding: "10px 20px",
-    backgroundColor: "#007BFF",
+    backgroundColor: "#012161",
     color: "white",
     border: "none",
     borderRadius: "8px",
@@ -164,7 +182,7 @@ const styles = {
     border: "1px solid #ddd",
     boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
   },
-  contactTitle: {
+  contacttitle: {
     marginBottom: "15px",
     color: "#2c3e50",
     fontSize: "20px",

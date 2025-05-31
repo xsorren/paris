@@ -633,7 +633,7 @@ section {
   padding: 10px;
   border-radius: 10px;
 }
-.blog-detail-category{
+.blog-detail-categoria{
   font-size: 12px;
   color: #253156;
   font-weight: bold;
@@ -689,11 +689,11 @@ section {
 .widget-search-result p{
   margin: 0;
 }
-.right-sidebar .category-ul {
+.right-sidebar .categoria-ul {
   margin: 0;
   padding: 0;
 }
-.right-sidebar .category-ul li{
+.right-sidebar .categoria-ul li{
   list-style: none;
   padding: 0;
   margin: 0;

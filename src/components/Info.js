@@ -19,7 +19,7 @@ const InfoGrid = styled.div`
   gap: 40px;
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 1200px;
+  max-width: 2000px;
 `;
 
 const InfoBox = styled.div`
@@ -42,7 +42,7 @@ const IconWrapper = styled.div`
   color: #012161;
 `;
 
-const Title = styled.h5`
+const title = styled.h5`
   font-size: 18px;
   font-weight: 600;
   margin: 0;
@@ -63,7 +63,7 @@ const Info = () => {
           <IconWrapper>
             <FontAwesomeIcon icon={faUsers} size="2x" />
           </IconWrapper>
-          <Title>{process.env.REACT_APP_INFO_SERVICE_1}</Title>
+          <title>{process.env.REACT_APP_INFO_SERVICE_1}</title>
           <Text>Tasaciones y asesoramiento</Text>
         </InfoBox>
 
@@ -71,7 +71,7 @@ const Info = () => {
           <IconWrapper>
             <FontAwesomeIcon icon={faBuilding} size="2x" />
           </IconWrapper>
-          <Title>{process.env.REACT_APP_INFO_SERVICE_2}</Title>
+          <title>{process.env.REACT_APP_INFO_SERVICE_2}</title>
           <Text>Casas, Departamentos, lotes y más</Text>
         </InfoBox>
 
@@ -79,7 +79,7 @@ const Info = () => {
           <IconWrapper>
             <FontAwesomeIcon icon={faMoneyBillAlt} size="2x" />
           </IconWrapper>
-          <Title>{process.env.REACT_APP_INFO_SERVICE_3}</Title>
+          <title>{process.env.REACT_APP_INFO_SERVICE_3}</title>
           <Text>Propiedades en Navarro y alrededores</Text>
         </InfoBox>
       </InfoGrid>

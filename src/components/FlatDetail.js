@@ -162,13 +162,13 @@ const FlatDetail = () => {
                                     </div>
                                 </div>
                                 <div className="fd-sidebar-item">
-                                    <h4>Category</h4>
-                                    <ul className="category-ul">
-                                        <li>Category 1</li>
-                                        <li>Category 2</li>
-                                        <li>Category 3</li>
-                                        <li>Category 4</li>
-                                        <li>Category 5</li>
+                                    <h4>categoria</h4>
+                                    <ul className="categoria-ul">
+                                        <li>categoria 1</li>
+                                        <li>categoria 2</li>
+                                        <li>categoria 3</li>
+                                        <li>categoria 4</li>
+                                        <li>categoria 5</li>
                                     </ul>
                                 </div>
                                 <div className="fd-sidebar-item">
