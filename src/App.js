@@ -15,7 +15,8 @@ import { useEffect } from "react";
 import Modal from "react-modal";
 import AdminUpload from "../src/firebase/AdminUpload";
 import { Navigate } from "react-router-dom";
- import RequireAdmin from "./components/RequireAdmin";
+import RequireAdmin from "./components/RequireAdmin";
+import EditPropiedad from "./components/EditPropiedad";
 
 function App() {
   useEffect(() => {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
+        <Route path="/editar-propiedad/:id" element={<EditPropiedad />} /> {/* ✅ nueva ruta */}
         <Route path="/flat/:slug" element={<FlatDetail />} />
         <Route path="/login" element={<Login />} />
         <Route
@@ -43,6 +45,7 @@ function App() {
           }
         />
       </Routes>
+
       <Footer />
     </div>
   );

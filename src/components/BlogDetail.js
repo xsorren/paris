@@ -99,11 +99,35 @@ const BlogDetail = () => {
         <p><strong>📐 Metros:</strong> {property.metros}</p>
         <p><strong>📝 Observaciones:</strong> {property.observacion || "Sin observaciones"}</p>
       </div>
+      {(localStorage.getItem("isAdmin") === "true" || sessionStorage.getItem("isAdmin") === "true") && (
+        <button
+          style={styles.editButton}
+          onClick={() => navigate(`/editar-propiedad/${property.id}`)}
+        >
+          ✏️ Editar propiedad
+        </button>
+      )}
+
     </div>
   );
 };
 
 const styles = {
+  editButton: {
+  display: "block",
+  margin: "40px auto 0 auto",
+  padding: "12px 24px",
+  backgroundColor: "#184a8e",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "18px",
+  fontWeight: "600",
+  cursor: "pointer",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  transition: "background-color 0.3s ease, transform 0.2s ease",
+},
+
   container: {
     padding: "40px 20px",
     maxWidth: "2000px",
