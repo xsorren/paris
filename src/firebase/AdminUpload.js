@@ -100,20 +100,10 @@ const handleUpload = async () => {
 
 
   return (
-    <div style={{
-      maxWidth: "520px",
-      margin: "40px auto",
-      padding: "30px 40px",
-      backgroundColor: "#fff",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-      borderRadius: "12px",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      color: "#333",
-      textAlign: "left"
-    }}>
-      <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#004080" }}>
-        Panel de Administración
-      </h2>
+    <div className="container-narrow">
+      <div className="form" style={{maxWidth: 680, margin: '32px auto'}}>
+        <h2 className="title-xl" style={{fontSize: 28, margin: 0}}>Panel de Administración</h2>
+        <div className="title-underline" />
 
       <p style={{ fontWeight: "600", fontSize: "1.1rem", marginBottom: "12px" }}>Instrucciones:</p>
       <ul style={{ marginBottom: "25px", lineHeight: "1.6", color: "#555", fontSize: "0.95rem" }}>
@@ -126,79 +116,75 @@ const handleUpload = async () => {
         <li>📤 Presioná <strong>“Subir Propiedad”</strong> para guardar.</li>
       </ul>
 
-      <label style={labelStyle}>Título <span style={{ color: "#c00" }}>*</span></label>
+      <label className="label">Título <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Casa con 2 plantas y jardín"
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
-        style={inputStyle}
+        className="form-control"
       />
 
-      <label style={labelStyle}>Categoría</label>
+      <label className="label">Categoría</label>
       <select
         value={categoria}
         onChange={(e) => setCategoria(e.target.value)}
-        style={selectStyle}
+        className="form-select"
       >
         <option value="casa">Casas</option>
         <option value="departamento">Departamentos</option>
         <option value="lote">Lotes</option>
         <option value="local">Locales</option>
       </select>
-      <label style={labelStyle}>Tipo de operación</label>
+      <label className="label">Tipo de operación</label>
       <select
         value={operacion}
         onChange={(e) => setOperacion(e.target.value)}
-        style={selectStyle}
+        className="form-select"
       >
         <option value="venta">Venta</option>
         <option value="alquiler">Alquiler</option>
       </select>
 
-      <label style={labelStyle}>Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
+      <label className="label">Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: 120"
         value={metros}
         onChange={(e) => setMetros(e.target.value)}
-        style={inputStyle}
+        className="form-control"
       />
 
-      <label style={labelStyle}>Ubicación <span style={{ color: "#c00" }}>*</span></label>
+      <label className="label">Ubicación <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Calle Falsa 123, CABA"
         value={localidad}
         onChange={(e) => setLocalidad(e.target.value)}
-        style={inputStyle}
+        className="form-control"
       />
 
-      <label style={labelStyle}>Observaciones</label>
+      <label className="label">Observaciones</label>
       <textarea
         placeholder="Detalles adicionales, comentarios, etc."
         value={observacion}
         onChange={(e) => setObservacion(e.target.value)}
-        style={textareaStyle}
+        className="textarea"
       />
 
-      <label style={labelStyle}>Imágenes (múltiples)</label>
+      <label className="label">Imágenes (múltiples)</label>
       <input
         type="file"
         accept="image/*"
         multiple
         onChange={(e) => setFiles(Array.from(e.target.files || []))}
-        style={inputStyle}
+        className="form-control"
       />
 
       <button
         onClick={handleUpload}
         disabled={loading}
-        style={{
-          ...buttonStyle,
-          backgroundColor: loading ? "#9ccc9c" : "#2e7d32",
-          cursor: loading ? "not-allowed" : "pointer"
-        }}
+        className={`btn ${loading ? 'btn-secondary' : 'btn-success'}`}
       >
         {loading ? "Subiendo..." : "Subir Propiedad"}
       </button>
@@ -231,63 +217,12 @@ const handleUpload = async () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
 
 // Estilos reutilizables
-const labelStyle = {
-  display: "block",
-  fontWeight: "600",
-  marginBottom: "6px",
-  marginTop: "12px",
-  color: "#004080",
-  fontSize: "0.95rem",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px 14px",
-  fontSize: "1rem",
-  borderRadius: "6px",
-  border: "1.5px solid #ccc",
-  outlineColor: "#004080",
-  boxSizing: "border-box",
-  transition: "border-color 0.3s ease",
-};
-
-const selectStyle = {
-  ...inputStyle,
-  appearance: "none",
-  backgroundColor: "#fff",
-  cursor: "pointer",
-};
-
-const textareaStyle = {
-  width: "100%",
-  minHeight: "80px",
-  padding: "10px 14px",
-  fontSize: "1rem",
-  borderRadius: "6px",
-  border: "1.5px solid #ccc",
-  outlineColor: "#004080",
-  resize: "vertical",
-  boxSizing: "border-box",
-  transition: "border-color 0.3s ease",
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "12px",
-  fontSize: "1.1rem",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  fontWeight: "700",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-  transition: "background-color 0.3s ease",
-};
-
 const modalBackdropStyle = {
   position: "fixed",
   top: 0, left: 0, right: 0, bottom: 0,

@@ -7,8 +7,8 @@ const TeamList = () => {
         description: "Lorem ipsum dolor sit ame"
     }
     return (
-        <section className="section-teams">
-            <div className="container">
+        <section>
+            <div className="container-narrow">
                 <Title title={title.text} description={title.description} />
                 <div className="row">
                     <TeamItem/>

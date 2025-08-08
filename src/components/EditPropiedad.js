@@ -124,90 +124,45 @@ const EditarPropiedad = () => {
   if (loading || !property) return <p style={styles.center}>Cargando...</p>;
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Editar Propiedad</h2>
+    <div className="container-narrow">
+      <div className="form" style={{maxWidth: 820, margin: '24px auto'}}>
+        <h2 className="title-xl" style={{fontSize: 28, margin: 0}}>Editar Propiedad</h2>
+        <div className="title-underline" />
 
-      <label style={styles.label}>Título:</label>
-      <input
-        name="titulo"
-        value={property.titulo}
-        onChange={handleChange}
-        style={styles.input}
-      />
+        <label className="label">Título</label>
+        <input name="titulo" value={property.titulo} onChange={handleChange} className="form-control" />
 
-      <label style={styles.label}>Ubicación:</label>
-      <input
-        name="localidad"
-        value={property.localidad}
-        onChange={handleChange}
-        style={styles.input}
-      />
+        <label className="label">Ubicación</label>
+        <input name="localidad" value={property.localidad} onChange={handleChange} className="form-control" />
 
-      <label style={styles.label}>Metros:</label>
-      <input
-        name="metros"
-        value={property.metros}
-        onChange={handleChange}
-        style={styles.input}
-      />
+        <label className="label">Metros</label>
+        <input name="metros" value={property.metros} onChange={handleChange} className="form-control" />
 
-      <label style={styles.label}>Observaciones:</label>
-      <textarea
-        name="observacion"
-        value={property.observacion}
-        onChange={handleChange}
-        style={styles.textarea}
-      />
+        <label className="label">Observaciones</label>
+        <textarea name="observacion" value={property.observacion} onChange={handleChange} className="textarea" />
 
-      <label style={styles.label}>Imágenes:</label>
-      {(property.images || []).map((img, index) => (
-        <div key={index} style={styles.imageRow}>
-          <input
-            value={img}
-            onChange={(e) => handleImageChange(index, e.target.value)}
-            style={styles.input}
-          />
-          <button
-            onClick={() => removeImage(index)}
-            style={styles.removeButton}
-            disabled={saving || deleting}
-          >
-            🗑
+        <label className="label">Imágenes</label>
+        <div className="thumb-grid" style={{marginBottom: 8}}>
+          {(property.images || []).map((img, index) => (
+            <div key={index} className="thumb">
+              <img src={img} alt={`img-${index}`} />
+              <button className="btn btn-danger remove" onClick={() => removeImage(index)} disabled={saving || deleting}>🗑</button>
+            </div>
+          ))}
+        </div>
+        <button onClick={addImage} className="btn btn-outline" disabled={saving || deleting}>+ Agregar URL manual</button>
+
+        <label className="label" style={{marginTop: 16}}>Subir nuevas imágenes</label>
+        <input type="file" multiple accept="image/*" onChange={(e) => setNewFiles(Array.from(e.target.files || []))} className="form-control" />
+
+        <div style={{display:'flex',gap:12,justifyContent:'flex-end',marginTop:20}}>
+          <button onClick={handleSave} className="btn btn-primary" disabled={saving || deleting}>
+            {saving ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+          <button onClick={confirmDelete} className="btn btn-danger" disabled={saving || deleting}>
+            {deleting ? 'Eliminando...' : 'Borrar propiedad'}
           </button>
         </div>
-      ))}
-      <button
-        onClick={addImage}
-        style={styles.secondaryButton}
-        disabled={saving || deleting}
-      >
-        + Agregar Imagen
-      </button>
-
-      <label style={styles.label}>Subir nuevas imágenes</label>
-      <input
-        type="file"
-        multiple
-        accept="image/*"
-        onChange={(e) => setNewFiles(Array.from(e.target.files || []))}
-        style={styles.input}
-      />
-
-      <div style={styles.buttonRow}>
-        <button
-          onClick={handleSave}
-          style={{ ...styles.saveButton, opacity: saving ? 0.6 : 1 }}
-          disabled={saving || deleting}
-        >
-          {saving ? "Guardando..." : "💾 Guardar cambios"}
-        </button>
-        <button
-          onClick={confirmDelete}
-          style={{ ...styles.deleteButton, opacity: deleting ? 0.6 : 1 }}
-          disabled={saving || deleting}
-        >
-          {deleting ? "Eliminando..." : "🗑 Borrar propiedad"}
-        </button>
       </div>
 
       {modal.visible && (

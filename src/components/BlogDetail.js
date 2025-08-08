@@ -36,203 +36,64 @@ const BlogDetail = () => {
   if (!property) return <p style={styles.center}>Propiedad no encontrada.</p>;
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>{property.title}</h1>
+    <div className="container-narrow">
+      <button className="btn btn-outline" onClick={() => navigate('/blog')}>← Volver</button>
+      <h1 className="title-xl" style={{marginTop: 10}}>{property.titulo}</h1>
+      <div className="title-underline" />
 
-      <button style={styles.backButton} onClick={() => navigate("/blog")}>
-        ← Volver al Blog
-      </button>
-      {/* Título centrado arriba */}
-      <h1 style={styles.title}>{property.titulo}</h1>
-      <div style={styles.titleUnderline}></div>
-
-      <div style={styles.content}>
-        {/* Carrusel de imágenes */}
-        <div style={styles.carouselSection}>
-          <div style={styles.imageContainer}>
+      <div style={{display:'flex',flexWrap:'wrap',gap:24,alignItems:'flex-start'}}>
+        <div style={{flex:'1 1 65%'}}>
+          <div className="card" style={{overflow:'hidden'}}>
             <img
-              src={
-                property.images?.[activeImage] ||
-                "https://via.placeholder.com/800x400"
-              }
+              src={property.images?.[activeImage] || 'https://via.placeholder.com/1200x600?text=Sin+imagen'}
               alt="Propiedad"
-              style={styles.mainImage}
+              className="card-image"
+              style={{height: '420px'}}
             />
           </div>
-
-          <div style={styles.thumbnailRow}>
-            {property.images?.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Miniatura ${index + 1}`}
-                style={{
-                  ...styles.thumbnail,
-                  border: index === activeImage ? "2px solid #007BFF" : "1px solid #ccc",
-                }}
-                onClick={() => setActiveImage(index)}
-              />
+          <div className="thumb-grid" style={{marginTop:12}}>
+            {(property.images || []).map((img, i) => (
+              <button key={i} className="thumb" onClick={() => setActiveImage(i)} style={{border: i===activeImage ? '2px solid var(--primary)' : undefined}}>
+                <img src={img} alt={`Miniatura ${i+1}`} loading="lazy" />
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Panel de contacto */}
-        <div style={styles.contactSection}>
-          <h3 style={styles.contacttitle}>📞 Vías de contacto</h3>
-          <p><strong>📱 Teléfono:</strong> 2227-535057</p>
-          <p><strong>📧 Email:</strong> parisnegociosinmobiliarios@gmail.com</p>
-          <p><strong>🏢 Oficina:</strong> Calle 28 Nº917, Navarro, Buenos Aires</p>
-          <a
-            href="https://wa.me/2227-535057"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.contactButton}
-          >
-            Contactar por WhatsApp
-          </a>
+        <div className="card sticky-panel" style={{flex:'1 1 30%'}}>
+          <div className="card-body">
+            <h3 className="card-title">Vías de contacto</h3>
+            <div className="card-sub" style={{marginBottom:16}}>
+              Respondemos rápido por WhatsApp o email.
+            </div>
+            <p><strong>Teléfono:</strong> 2227-535057</p>
+            <p><strong>Email:</strong> parisnegociosinmobiliarios@gmail.com</p>
+            <p><strong>Oficina:</strong> Calle 28 Nº917, Navarro, Buenos Aires</p>
+            <a href="https://wa.me/2227-535057" target="_blank" rel="noopener noreferrer" className="btn btn-success" style={{marginTop:6}}>WhatsApp</a>
+          </div>
         </div>
       </div>
 
-      {/* Información de la propiedad */}
-      <div style={styles.details}>
-        <p><strong>📍 Ubicación:</strong> {property.localidad}</p>
-        <p><strong>📐 Metros:</strong> {property.metros}</p>
-        <p><strong>📝 Observaciones:</strong> {property.observacion || "Sin observaciones"}</p>
+      <div className="card" style={{marginTop:24}}>
+        <div className="card-body">
+          <div className="badges" style={{marginBottom:12}}>
+            {property.categoria && <span className="badge badge-blue">{property.categoria}</span>}
+            {property.operacion && <span className="badge badge-green">{property.operacion}</span>}
+          </div>
+          <p><strong>Ubicación:</strong> {property.localidad}</p>
+          <p><strong>Metros:</strong> {property.metros}</p>
+          <p><strong>Observaciones:</strong> {property.observacion || 'Sin observaciones'}</p>
+          {(localStorage.getItem('isAdmin') === 'true' || sessionStorage.getItem('isAdmin') === 'true') && (
+            <button className="btn btn-primary" onClick={() => navigate(`/editar-propiedad/${property.id}`)} style={{marginTop:12}}>Editar propiedad</button>
+          )}
+        </div>
       </div>
-      {(localStorage.getItem("isAdmin") === "true" || sessionStorage.getItem("isAdmin") === "true") && (
-        <button
-          style={styles.editButton}
-          onClick={() => navigate(`/editar-propiedad/${property.id}`)}
-        >
-          ✏️ Editar propiedad
-        </button>
-      )}
-
     </div>
   );
 };
 
 const styles = {
-  editButton: {
-  display: "block",
-  margin: "40px auto 0 auto",
-  padding: "12px 24px",
-  backgroundColor: "#184a8e",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  fontSize: "18px",
-  fontWeight: "600",
-  cursor: "pointer",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  transition: "background-color 0.3s ease, transform 0.2s ease",
-},
-
-  container: {
-    padding: "40px 20px",
-    maxWidth: "2000px",
-    margin: "0 auto",
-    fontFamily: "Arial, sans-serif",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: "42px",
-    fontWeight: "700",
-    color: "#1a1a1a",
-    marginBottom: "30px",
-    textTransform: "uppercase",
-    letterSpacing: "1.5px",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    position: "relative",
-  },
-
-  // Agregá este nuevo estilo para la línea decorativa opcional debajo del título (usado con un <div>)
-  titleUnderline: {
-    width: "80px",
-    height: "4px",
-    backgroundColor: "#184a8e",
-    margin: "0 auto 40px auto",
-    borderRadius: "2px",
-  },
-
-  backButton: {
-    display: "block",
-    margin: "0 auto 30px auto",
-    padding: "10px 20px",
-    backgroundColor: "#012161",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  content: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "30px",
-    justifyContent: "space-between",
-  },
-  carouselSection: {
-    flex: "1 1 65%",
-  },
-  imageContainer: {
-    borderRadius: "10px",
-    overflow: "hidden",
-    marginBottom: "10px",
-  },
-  mainImage: {
-    width: "100%",
-    height: "400px",
-    objectFit: "cover",
-    borderRadius: "10px",
-  },
-  thumbnailRow: {
-    display: "flex",
-    gap: "10px",
-    overflowX: "auto",
-  },
-  thumbnail: {
-    width: "100px",
-    height: "70px",
-    objectFit: "cover",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-  contactSection: {
-    flex: "1 1 30%",
-    backgroundColor: "#f8f9fa",
-    padding: "20px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-  },
-  contacttitle: {
-    marginBottom: "15px",
-    color: "#2c3e50",
-    fontSize: "20px",
-  },
-  contactButton: {
-    marginTop: "15px",
-    display: "inline-block",
-    padding: "10px 15px",
-    backgroundColor: "#25D366",
-    color: "white",
-    borderRadius: "5px",
-    textDecoration: "none",
-    fontWeight: "bold",
-  },
-  details: {
-    marginTop: "40px",
-    backgroundColor: "#ffffff",
-    padding: "20px",
-    borderRadius: "10px",
-    fontSize: "18px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-  },
-  center: {
-    textAlign: "center",
-    padding: "50px",
-  },
+  // remaining style object trimmed; replaced by CSS classes
 };
 
 export default BlogDetail;

@@ -1,15 +1,13 @@
-const title = (props) => {
-    const {title,description}=props
+const Title = ({ title, description }) => {
     return (
-        <div className="row">
-            <div className="col-lg-6 mx-auto">
-                <div className="title-area text-center">
-                    <h2 className="title">{title}</h2>
-                    <p className="title-description">{description}</p>
-                </div>
-            </div>
+        <div style={{textAlign:'center',margin:'10px 0 20px'}}>
+            <h2 className="title-xl" style={{fontSize:28,margin:'8px 0'}}>{title}</h2>
+            <div className="title-underline" />
+            {description && (
+                <p style={{color:'var(--muted)',maxWidth:720,margin:'0 auto'}}>{description}</p>
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default title
+export default Title;

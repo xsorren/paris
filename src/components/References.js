@@ -36,8 +36,8 @@ const References = () => {
         ]
     };
     return (
-        <section className="section-references">
-            <div className="container">
+        <section>
+            <div className="container-narrow">
                 <Title title={title.text} description={title.description} />
                 <div className="row">
                     <div className="col-lg-12">

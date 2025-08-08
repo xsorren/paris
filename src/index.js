@@ -4,6 +4,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 
 import { db, auth } from './firebase/firebaseConfig';
+import './ui.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

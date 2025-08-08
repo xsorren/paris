@@ -5,79 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserTie, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 
-// Estilos
-const FooterSection = styled.footer`
-  background-color: #012161;
-  color: white;
-  padding: 40px 20px;
-  font-family: 'Segoe UI', sans-serif;
-  width: 100%;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 40px;
-`;
-
-const Column = styled.div`
-  flex: 1 1 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const title = styled.h4`
-  font-weight: 700;
-  font-size: 22px;
-  margin-bottom: 8px;
-  color: #ffc107;
-  border-bottom: 2px solid #ffc107;
-  padding-bottom: 5px;
-  width: fit-content;
-`;
-
-const InfoText = styled.span`
-  font-size: 15px;
-  line-height: 1.6;
-  color: #f0f0f0;
-`;
-
-const SocialIcons = styled.div`
-  display: flex;
-  gap: 15px;
-  margin-top: 10px;
-`;
-
-const IconBox = styled.a`
-  font-size: 20px;
-  color: white;
-  transition: color 0.3s;
-
-  &:hover {
-    color: #ffc107;
-  }
-`;
-
-const InfoList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 15px;
-  color: #f0f0f0;
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-`;
-
 const Footer = () => {
   const navigate = useNavigate();
   const timerRef = useRef(null);
@@ -93,10 +20,10 @@ const Footer = () => {
   };
 
   return (
-    <FooterSection>
-      <Container>
-        <Column>
-          <title>Sobre Nosotros</title>
+    <footer style={{background:'#012161', color:'#fff', padding:'40px 20px'}}>
+      <div className="container-narrow" style={{display:'flex',flexWrap:'wrap',gap:24,justifyContent:'space-between'}}>
+        <div style={{flex:'1 1 320px'}}>
+          <h4 style={{fontWeight:700,fontSize:22,color:'#ffc107',borderBottom:'2px solid #ffc107',width:'fit-content',paddingBottom:5,marginTop:0}}>Sobre Nosotros</h4>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
             <FontAwesomeIcon
               icon={faUserTie}
@@ -107,33 +34,33 @@ const Footer = () => {
               onDoubleClick={() => navigate('/login')}
               style={{ cursor: 'default', color: '#ffc107', marginTop: '4px' }}
             />
-            <InfoList>
-              <li><i className="fas fa-user" /> Claudio Paris</li>
-              <li><i className="fas fa-briefcase" /> Asesor Inmobiliario</li>
-              <li><i className="fas fa-id-badge" /> Coleg. N° 4058 T°IX F°4058 - CMCPDJ Mercedes</li>
-            </InfoList>
+            <ul style={{listStyle:'none',margin:0,padding:0,fontSize:15,color:'#f0f0f0'}}>
+              <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-user" /> Claudio Paris</li>
+              <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-briefcase" /> Asesor Inmobiliario</li>
+              <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-id-badge" /> Coleg. N° 4058 T°IX F°4058 - CMCPDJ Mercedes</li>
+            </ul>
           </div>
-          <SocialIcons>
-            <IconBox href="mailto:parisnegociosinmobiliarios@gmail.com" title="Enviar mail">
+          <div style={{display:'flex',gap:15,marginTop:10}}>
+            <a href="mailto:parisnegociosinmobiliarios@gmail.com" title="Enviar mail" style={{color:'#fff',fontSize:20}}>
               <FontAwesomeIcon icon={faEnvelope} />
-            </IconBox>
-            <IconBox href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" title="Instagram">
+            </a>
+            <a href="https://www.instagram.com/parisnegociosinmobiliarios/" target="_blank" title="Instagram" style={{color:'#fff',fontSize:20}}>
               <FontAwesomeIcon icon={faInstagram} />
-            </IconBox>
-          </SocialIcons>
-        </Column>
+            </a>
+          </div>
+        </div>
 
-        <Column>
-          <title>Contacto</title>
-          <InfoList>
-            <li><i className="fas fa-clock" /> Horarios: 08:00–12:30 / 16:00–20:00</li>
-            <li><i className="fas fa-phone" /> Teléfono: 2227-535057</li>
-            <li><i className="fas fa-envelope" /> Email: parisnegociosinmobiliarios@gmail.com</li>
-            <li><i className="fas fa-map-marker-alt" /> Oficina: Calle 28 Nº917, Navarro, Buenos Aires</li>
-          </InfoList>
-        </Column>
-      </Container>
-    </FooterSection>
+        <div style={{flex:'1 1 320px'}}>
+          <h4 style={{fontWeight:700,fontSize:22,color:'#ffc107',borderBottom:'2px solid #ffc107',width:'fit-content',paddingBottom:5,marginTop:0}}>Contacto</h4>
+          <ul style={{listStyle:'none',margin:0,padding:0,fontSize:15,color:'#f0f0f0'}}>
+            <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-clock" /> Horarios: 08:00–12:30 / 16:00–20:00</li>
+            <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-phone" /> Teléfono: 2227-535057</li>
+            <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-envelope" /> Email: parisnegociosinmobiliarios@gmail.com</li>
+            <li style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}><i className="fas fa-map-marker-alt" /> Oficina: Calle 28 Nº917, Navarro, Buenos Aires</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
   );
 };
 
