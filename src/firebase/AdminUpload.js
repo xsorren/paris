@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveProperty } from "./propertyService";
+import { uploadImages } from "./uploadService";
+import { db } from "./firebaseConfig";
+import { doc, updateDoc } from "firebase/firestore";
 
 const AdminUpload = () => {
   const [titulo, setTitulo] = useState("");
@@ -11,6 +14,7 @@ const AdminUpload = () => {
   const [observacion, setObservacion] = useState("");
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true });
+  const [files, setFiles] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const handleUpload = async () => {
 
   setLoading(true);
   try {
-    const propertyData = {
+    const baseData = {
       titulo,
       categoria,
       metros,
@@ -63,16 +67,30 @@ const handleUpload = async () => {
       observacion,
       operacion,
       images: [],
+      imagesPaths: [],
     };
 
-    await saveProperty(propertyData);
+    // 1) Crear documento base
+    const propertyId = await saveProperty(baseData);
+
+    // 2) Subir imágenes si hay archivos
+    if (files.length > 0) {
+      const { urls, paths } = await uploadImages(files, categoria, propertyId);
+      await updateDoc(doc(db, "propiedades", propertyId), {
+        images: urls,
+        imagesPaths: paths,
+      });
+    }
+
     showModal("Propiedad subida con éxito.", true);
 
+    // Reset de formulario
     setTitulo("");
     setMetros("");
     setLocalidad("");
     setObservacion("");
     setOperacion("venta");
+    setFiles([]);
   } catch (error) {
     console.error("Error al subir la propiedad:", error);
     showModal("Hubo un error al guardar la propiedad. Intentá nuevamente.", false);
@@ -162,6 +180,15 @@ const handleUpload = async () => {
         value={observacion}
         onChange={(e) => setObservacion(e.target.value)}
         style={textareaStyle}
+      />
+
+      <label style={labelStyle}>Imágenes (múltiples)</label>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => setFiles(Array.from(e.target.files || []))}
+        style={inputStyle}
       />
 
       <button

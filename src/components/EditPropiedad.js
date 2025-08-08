@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { storage } from "../firebase/firebaseConfig";
+import { ref, deleteObject } from "firebase/storage";
+import { uploadImages } from "../firebase/uploadService";
 
 const EditarPropiedad = () => {
   const { id } = useParams();
@@ -10,6 +13,7 @@ const EditarPropiedad = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [newFiles, setNewFiles] = useState([]);
 
   const [modal, setModal] = useState({
     visible: false,
@@ -51,17 +55,42 @@ const EditarPropiedad = () => {
     setProperty({ ...property, images: [...(property.images || []), ""] });
   };
 
-  const removeImage = (index) => {
-    const updatedImages = [...property.images];
+  const removeImage = async (index) => {
+    // Quitar URL y path correspondientes si existen
+    const updatedImages = [...(property.images || [])];
+    const updatedPaths = [...(property.imagesPaths || [])];
+    const pathToDelete = updatedPaths[index];
+
     updatedImages.splice(index, 1);
-    setProperty({ ...property, images: updatedImages });
+    updatedPaths.splice(index, 1);
+
+    setProperty({ ...property, images: updatedImages, imagesPaths: updatedPaths });
+
+    // Opcional: borrar del Storage si tenemos path
+    try {
+      if (pathToDelete) {
+        await deleteObject(ref(storage, pathToDelete));
+      }
+    } catch (e) {
+      console.warn("No se pudo borrar del Storage:", e);
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const docRef = doc(db, "propiedades", id);
-      await updateDoc(docRef, property);
+  const docRef = doc(db, "propiedades", id);
+
+  // Subir imágenes nuevas si corresponde y mergear arrays
+  let images = property.images || [];
+  let imagesPaths = property.imagesPaths || [];
+  if (newFiles.length > 0) {
+    const { urls, paths } = await uploadImages(newFiles, property.categoria || "casa", id);
+    images = [...images, ...urls];
+    imagesPaths = [...imagesPaths, ...paths];
+  }
+
+  await updateDoc(docRef, { ...property, images, imagesPaths });
       showModal("Propiedad actualizada correctamente", () => navigate(`/blog`));
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -154,6 +183,15 @@ const EditarPropiedad = () => {
       >
         + Agregar Imagen
       </button>
+
+      <label style={styles.label}>Subir nuevas imágenes</label>
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={(e) => setNewFiles(Array.from(e.target.files || []))}
+        style={styles.input}
+      />
 
       <div style={styles.buttonRow}>
         <button
