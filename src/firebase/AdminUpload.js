@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { saveProperty } from "./propertyService";
+import { createProperty, updatePropertyImages } from "./propertyService";
 import { uploadImages } from "./uploadService";
-import { db } from "./firebaseConfig";
-import { doc, updateDoc } from "firebase/firestore";
 
 const AdminUpload = () => {
   const [titulo, setTitulo] = useState("");
@@ -12,9 +10,9 @@ const AdminUpload = () => {
   const [metros, setMetros] = useState("");
   const [localidad, setLocalidad] = useState("");
   const [observacion, setObservacion] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true });
-  const [files, setFiles] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,71 +37,68 @@ const AdminUpload = () => {
     setModal({ show: false, message: "", success: true });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAdmin");
-    navigate("/login");
-  };
+  const handleUpload = async () => {
+    const errores = [];
 
-const handleUpload = async () => {
-  const errores = [];
+    if (!titulo.trim()) errores.push("el título");
+    if (!metros.trim()) errores.push("los metros");
+    if (!localidad.trim()) errores.push("la ubicación");
 
-  if (!titulo.trim()) errores.push("el título");
-  if (!metros.trim()) errores.push("los metros");
-  if (!localidad.trim()) errores.push("la ubicación");
-
-  if (errores.length > 0) {
-    const mensaje = `Por favor, completá ${errores.join(", ")}.`;
-    showModal(mensaje, false);
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const baseData = {
-      titulo,
-      categoria,
-      metros,
-      localidad,
-      observacion,
-      operacion,
-      images: [],
-      imagesPaths: [],
-    };
-
-    // 1) Crear documento base
-    const propertyId = await saveProperty(baseData);
-
-    // 2) Subir imágenes si hay archivos
-    if (files.length > 0) {
-      const { urls, paths } = await uploadImages(files, categoria, propertyId);
-      await updateDoc(doc(db, "propiedades", propertyId), {
-        images: urls,
-        imagesPaths: paths,
-      });
+    if (errores.length > 0) {
+      const mensaje = `Por favor, completá ${errores.join(", ")}.`;
+      showModal(mensaje, false);
+      return;
     }
 
-    showModal("Propiedad subida con éxito.", true);
+    setLoading(true);
+    try {
+      const propertyData = {
+        titulo,
+        categoria,
+        metros,
+        localidad,
+        observacion,
+        operacion,
+        images: [],
+        imagesPaths: [],
+      };
+      const propertyId = await createProperty(propertyData);
 
-    // Reset de formulario
-    setTitulo("");
-    setMetros("");
-    setLocalidad("");
-    setObservacion("");
-    setOperacion("venta");
-    setFiles([]);
-  } catch (error) {
-    console.error("Error al subir la propiedad:", error);
-    showModal("Hubo un error al guardar la propiedad. Intentá nuevamente.", false);
-  }
-  setLoading(false);
-};
+      if (selectedFiles.length > 0) {
+        const { urls, paths } = await uploadImages(selectedFiles, categoria, propertyId);
+        await updatePropertyImages(propertyId, urls, paths);
+      }
 
+      showModal("Propiedad subida con éxito.", true);
+
+      setTitulo("");
+      setMetros("");
+      setLocalidad("");
+      setObservacion("");
+      setOperacion("venta");
+      setSelectedFiles([]);
+    } catch (error) {
+      console.error("Error al subir la propiedad:", error);
+      showModal("Hubo un error al guardar la propiedad. Intentá nuevamente.", false);
+    }
+    setLoading(false);
+  };
 
   return (
-    <div className="container-narrow">
-      <div className="form" style={{maxWidth: 680, margin: '32px auto'}}>
-        <h2 className="title-xl" style={{fontSize: 28, margin: 0}}>Panel de Administración</h2>
-        <div className="title-underline" />
+    <div style={{
+      maxWidth: "520px",
+      margin: "40px auto",
+      padding: "30px 40px",
+      backgroundColor: "#fff",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+      borderRadius: "12px",
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      color: "#333",
+      textAlign: "left"
+    }}>
+      <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#004080" }}>
+        Panel de Administración
+      </h2>
 
       <p style={{ fontWeight: "600", fontSize: "1.1rem", marginBottom: "12px" }}>Instrucciones:</p>
       <ul style={{ marginBottom: "25px", lineHeight: "1.6", color: "#555", fontSize: "0.95rem" }}>
@@ -113,83 +108,87 @@ const handleUpload = async () => {
         <li>📐 Ingresá los <strong>metros</strong> del terreno (ejemplo: 120).</li>
         <li>📍 Indicá la <strong>ubicación</strong> completa.</li>
         <li>📝 Agregá alguna <strong>observación</strong> si querés.</li>
+        <li>🖼️ Seleccioná <strong>imágenes</strong> para subir.</li>
         <li>📤 Presioná <strong>“Subir Propiedad”</strong> para guardar.</li>
       </ul>
 
-      <label className="label">Título <span style={{ color: "#c00" }}>*</span></label>
+      <label style={labelStyle}>Título <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Casa con 2 plantas y jardín"
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
-        className="form-control"
+        style={inputStyle}
       />
 
-      <label className="label">Categoría</label>
+      <label style={labelStyle}>Categoría</label>
       <select
         value={categoria}
         onChange={(e) => setCategoria(e.target.value)}
-        className="form-select"
+        style={selectStyle}
       >
         <option value="casa">Casas</option>
         <option value="departamento">Departamentos</option>
         <option value="lote">Lotes</option>
         <option value="local">Locales</option>
       </select>
-      <label className="label">Tipo de operación</label>
+
+      <label style={labelStyle}>Tipo de operación</label>
       <select
         value={operacion}
         onChange={(e) => setOperacion(e.target.value)}
-        className="form-select"
+        style={selectStyle}
       >
         <option value="venta">Venta</option>
         <option value="alquiler">Alquiler</option>
       </select>
 
-      <label className="label">Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
+      <label style={labelStyle}>Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: 120"
         value={metros}
         onChange={(e) => setMetros(e.target.value)}
-        className="form-control"
+        style={inputStyle}
       />
 
-      <label className="label">Ubicación <span style={{ color: "#c00" }}>*</span></label>
+      <label style={labelStyle}>Ubicación <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
         placeholder="Ej: Calle Falsa 123, CABA"
         value={localidad}
         onChange={(e) => setLocalidad(e.target.value)}
-        className="form-control"
+        style={inputStyle}
       />
 
-      <label className="label">Observaciones</label>
+      <label style={labelStyle}>Observaciones</label>
       <textarea
         placeholder="Detalles adicionales, comentarios, etc."
         value={observacion}
         onChange={(e) => setObservacion(e.target.value)}
-        className="textarea"
+        style={textareaStyle}
       />
 
-      <label className="label">Imágenes (múltiples)</label>
+      <label style={labelStyle}>Imágenes</label>
       <input
         type="file"
-        accept="image/*"
         multiple
-        onChange={(e) => setFiles(Array.from(e.target.files || []))}
-        className="form-control"
+        onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
+        style={inputStyle}
       />
 
       <button
         onClick={handleUpload}
         disabled={loading}
-        className={`btn ${loading ? 'btn-secondary' : 'btn-success'}`}
+        style={{
+          ...buttonStyle,
+          backgroundColor: loading ? "#9ccc9c" : "#2e7d32",
+          cursor: loading ? "not-allowed" : "pointer"
+        }}
       >
         {loading ? "Subiendo..." : "Subir Propiedad"}
       </button>
 
-      {/* Modal */}
       {modal.show && (
         <div style={modalBackdropStyle}>
           <div style={modalContentStyle}>
@@ -217,12 +216,62 @@ const handleUpload = async () => {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };
 
-// Estilos reutilizables
+const labelStyle = {
+  display: "block",
+  fontWeight: "600",
+  marginBottom: "6px",
+  marginTop: "12px",
+  color: "#004080",
+  fontSize: "0.95rem",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "10px 14px",
+  fontSize: "1rem",
+  borderRadius: "6px",
+  border: "1.5px solid #ccc",
+  outlineColor: "#004080",
+  boxSizing: "border-box",
+  transition: "border-color 0.3s ease",
+};
+
+const selectStyle = {
+  ...inputStyle,
+  appearance: "none",
+  backgroundColor: "#fff",
+  cursor: "pointer",
+};
+
+const textareaStyle = {
+  width: "100%",
+  minHeight: "80px",
+  padding: "10px 14px",
+  fontSize: "1rem",
+  borderRadius: "6px",
+  border: "1.5px solid #ccc",
+  outlineColor: "#004080",
+  resize: "vertical",
+  boxSizing: "border-box",
+  transition: "border-color 0.3s ease",
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: "12px",
+  fontSize: "1.1rem",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "700",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  transition: "background-color 0.3s ease",
+};
+
 const modalBackdropStyle = {
   position: "fixed",
   top: 0, left: 0, right: 0, bottom: 0,

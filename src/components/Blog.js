@@ -55,7 +55,7 @@ const Blog = () => {
       <div className="title-underline" />
 
       <div className="filters">
-        {["todas", "casa", "departamento", "lote"].map((tipo) => (
+        {["todas", "casa", "departamento", "lote","locales"].map((tipo) => (
           <button
             key={tipo}
             className={`btn ${filtroActivo === tipo ? 'btn-primary' : 'btn-outline'}`}

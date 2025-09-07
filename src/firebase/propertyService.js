@@ -1,7 +1,19 @@
 import { db } from "./firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
 
-export const saveProperty = async (propertyData) => {
-    const docRef = await addDoc(collection(db, "propiedades"), propertyData);
-    return docRef.id;
+export const createProperty = async (propertyData) => {
+  const docRef = await addDoc(collection(db, "propiedades"), {
+    ...propertyData,
+    images: [],
+    imagesPaths: []
+  });
+  return docRef.id;
+};
+
+export const updatePropertyImages = async (propertyId, urls, paths) => {
+  const propertyRef = doc(db, "propiedades", propertyId);
+  await updateDoc(propertyRef, {
+    images: urls,
+    imagesPaths: paths
+  });
 };

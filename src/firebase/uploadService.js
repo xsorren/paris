@@ -1,25 +1,25 @@
 import { storage } from "./firebaseConfig";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 
-/**
- * Sube archivos a Storage y retorna URLs públicas y paths internos.
- * @param {File[]} files
- * @param {string} categoria
- * @param {string} propertyId
- * @returns {{ urls: string[], paths: string[] }}
- */
 export const uploadImages = async (files, categoria, propertyId) => {
   const urls = [];
   const paths = [];
 
   for (const file of files) {
-    const objectPath = `${categoria}/${propertyId}/${file.name}`;
-    const storageRef = ref(storage, objectPath);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
+    const path = `${categoria}/${propertyId}/${file.name}`;
+    const storageRef = ref(storage, path);
+    const uploadTask = await uploadBytesResumable(storageRef, file);
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+
     urls.push(downloadURL);
-    paths.push(objectPath);
+    paths.push(path);
   }
 
   return { urls, paths };
+};
+
+// Para borrar una imagen por path
+export const deleteImage = async (path) => {
+  const imageRef = ref(storage, path);
+  await deleteObject(imageRef);
 };

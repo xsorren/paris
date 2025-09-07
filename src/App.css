@@ -802,3 +802,43 @@ section {
   z-index: 1000;
 }
 
+.file-upload-btn {
+  display: block; /* antes estaba inline-block */
+  width: fit-content; /* o 100% si lo querés ancho */
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #0f2a60, #0b1e45);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 12px 0;
+}
+
+
+.file-upload-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #00408d);
+  transform: translateY(-2px);
+}
+
+.file-upload-btn input[type="file"] {
+  display: none; /* Ocultamos el input real */
+}
+
+.preview-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.preview-grid img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
