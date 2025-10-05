@@ -1,21 +1,58 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithGoogle, signInWithEmail } from '../firebase/authService';
+import usePageTitle from '../hooks/usePageTitle';
 
 const Login = () => {
+  usePageTitle("Iniciar Sesión");
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
-    if (username === "admin" && password === "inmoParis2024") {
-      setAuthSuccess(true);
-      setShowModal(true); // Mostrar el modal de confirmación
-    } else {
-      alert("Usuario o contraseña incorrectos.");
+    try {
+      // Intentar autenticación con email y contraseña
+      const result = await signInWithEmail(username, password);
+      
+      if (result.success) {
+        setAuthSuccess(true);
+        setShowModal(true);
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError('Error al iniciar sesión. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result.success) {
+        setAuthSuccess(true);
+        setShowModal(true);
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError('Error al iniciar sesión con Google. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,23 +73,46 @@ const Login = () => {
 
   return (
     <div style={styles.wrapper}>
-      <form onSubmit={handleLogin} style={styles.form}>
-        <input
-          type="text"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          placeholder="Usuario"
-          style={styles.input}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>Ingresar</button>
-      </form>
+      <div style={styles.form}>
+        <h2 style={styles.title}>Iniciar Sesión</h2>
+        <p style={styles.subtitle}>Solo emails autorizados pueden acceder</p>
+        
+        {error && (
+          <div style={styles.errorMessage}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            placeholder="Email"
+            style={styles.input}
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="Contraseña"
+            style={styles.input}
+            required
+          />
+          <button 
+            type="submit" 
+            style={{...styles.button, ...styles.emailButton}}
+            disabled={loading}
+          >
+            {loading ? 'Iniciando...' : 'Ingresar con Email'}
+          </button>
+        </form>
+
+        <div style={styles.divider}>
+          <span style={styles.dividerText}>O</span>
+        </div>
+      </div>
 
       {/* Modal personalizado */}
       {showModal && authSuccess && (
@@ -77,32 +137,78 @@ const styles = {
     alignItems: 'center',
     height: '100vh',
     flexDirection: 'column',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   },
   form: {
     background: "#fff",
-    padding: "30px 40px",
-    borderRadius: "10px",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-    textAlign: "center"
+    padding: "40px",
+    borderRadius: "15px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+    textAlign: "center",
+    minWidth: '350px',
+    maxWidth: '400px',
+  },
+  title: {
+    color: "#0b1f44",
+    marginBottom: "10px",
+    fontSize: "28px",
+    fontWeight: "bold",
+  },
+  subtitle: {
+    color: "#666",
+    marginBottom: "25px",
+    fontSize: "14px",
+  },
+  errorMessage: {
+    background: "#ffebee",
+    color: "#c62828",
+    padding: "10px",
+    borderRadius: "6px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    border: "1px solid #ffcdd2",
   },
   input: {
-    margin: 10,
-    padding: 12,
+    margin: "8px 0",
+    padding: "12px 15px",
     width: '100%',
-    minWidth: '250px',
     fontSize: "16px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
+    borderRadius: "8px",
+    border: "2px solid #e0e0e0",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+    boxSizing: "border-box",
   },
   button: {
-    marginTop: 15,
-    padding: '10px 25px',
+    marginTop: "10px",
+    padding: "12px 20px",
     fontSize: "16px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    width: "100%",
+    fontWeight: "600",
+    transition: "all 0.3s ease",
+  },
+  emailButton: {
     backgroundColor: "#0b1f44",
     color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
+  },
+  googleButton: {
+    backgroundColor: "#fff",
+    color: "#333",
+    border: "2px solid #e0e0e0",
+  },
+  divider: {
+    margin: "20px 0",
+    position: "relative",
+    textAlign: "center",
+  },
+  dividerText: {
+    background: "#fff",
+    padding: "0 15px",
+    color: "#666",
+    fontSize: "14px",
   },
   modalOverlay: {
     position: "fixed",

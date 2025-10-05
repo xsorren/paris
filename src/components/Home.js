@@ -6,8 +6,11 @@ import TeamList from "./TeamList";
 import References from "./References";
 import Subscribe from "./Subscribe";
 import Map from "./Map";
+import usePageTitle from "../hooks/usePageTitle";
 
 const Home = () => {
+    usePageTitle("Inicio");
+    
     return (
         <React.Fragment>
             <Banner />

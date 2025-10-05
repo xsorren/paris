@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveProperty } from "./propertyService";
+import { uploadMultipleImages, testStorageConnection } from "./imageUploadService";
+import ImageUpload from "../components/ImageUpload";
+import usePageTitle from "../hooks/usePageTitle";
 
 const AdminUpload = () => {
+  usePageTitle("Panel de Administración");
+  
   const [titulo, setTitulo] = useState("");
   const [categoria, setCategoria] = useState("casa");
   const [operacion, setOperacion] = useState("venta");
@@ -11,6 +16,9 @@ const AdminUpload = () => {
   const [observacion, setObservacion] = useState("");
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true });
+  const [images, setImages] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [propertyId, setPropertyId] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +27,15 @@ const AdminUpload = () => {
       navigate("/login");
       return;
     }
+
+    // Generar un ID único para la propiedad
+    const newPropertyId = `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setPropertyId(newPropertyId);
+
+    // Probar conexión con Storage
+    testStorageConnection().then(result => {
+      console.log('Resultado de prueba de Storage:', result);
+    });
 
     const welcomeMessage = localStorage.getItem("welcomeMessage");
     if (welcomeMessage) {
@@ -55,6 +72,30 @@ const handleUpload = async () => {
 
   setLoading(true);
   try {
+    let uploadedImages = [];
+    
+    // Subir imágenes si hay archivos seleccionados
+    if (selectedFiles.length > 0) {
+      console.log('Iniciando subida de imágenes:', selectedFiles.length, 'archivos');
+      console.log('Property ID:', propertyId);
+      console.log('Categoría:', categoria);
+      
+      const uploadResult = await uploadMultipleImages(selectedFiles, propertyId, categoria, operacion);
+      console.log('Resultado de subida:', uploadResult);
+      
+      if (uploadResult.success) {
+        uploadedImages = uploadResult.images;
+        console.log('Imágenes subidas exitosamente:', uploadedImages);
+      } else {
+        console.error('Error al subir imágenes:', uploadResult.error);
+        showModal(`Error al subir las imágenes: ${uploadResult.error}`, false);
+        setLoading(false);
+        return;
+      }
+    } else {
+      console.log('No hay archivos seleccionados para subir');
+    }
+
     const propertyData = {
       titulo,
       categoria,
@@ -62,23 +103,38 @@ const handleUpload = async () => {
       localidad,
       observacion,
       operacion,
-      images: [],
+      images: uploadedImages, // Incluir las URLs de las imágenes subidas
     };
 
-    await saveProperty(propertyData);
-    showModal("Propiedad subida con éxito.", true);
+    const saveResult = await saveProperty(propertyData);
+    
+    if (saveResult.success) {
+      showModal(`Propiedad subida con éxito. ${uploadedImages.length > 0 ? `Se subieron ${uploadedImages.length} imagen${uploadedImages.length > 1 ? 'es' : ''}.` : ''}`, true);
+    } else {
+      showModal(`Error al guardar la propiedad: ${saveResult.error}`, false);
+      setLoading(false);
+      return;
+    }
 
+    // Limpiar formulario
     setTitulo("");
     setMetros("");
     setLocalidad("");
     setObservacion("");
     setOperacion("venta");
+    setImages([]);
+    setSelectedFiles([]);
+    
+    // Generar nuevo ID para la siguiente propiedad
+    const newPropertyId = `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setPropertyId(newPropertyId);
   } catch (error) {
     console.error("Error al subir la propiedad:", error);
     showModal("Hubo un error al guardar la propiedad. Intentá nuevamente.", false);
   }
   setLoading(false);
 };
+
 
 
   return (
@@ -105,7 +161,8 @@ const handleUpload = async () => {
         <li>📐 Ingresá los <strong>metros</strong> del terreno (ejemplo: 120).</li>
         <li>📍 Indicá la <strong>ubicación</strong> completa.</li>
         <li>📝 Agregá alguna <strong>observación</strong> si querés.</li>
-        <li>📤 Presioná <strong>“Subir Propiedad”</strong> para guardar.</li>
+        <li>📷 <strong>Seleccioná imágenes</strong> de la propiedad (opcional, máximo 10).</li>
+        <li>📤 Presioná <strong>"Subir Propiedad"</strong> para subir todo junto.</li>
       </ul>
 
       <label style={labelStyle}>Título <span style={{ color: "#c00" }}>*</span></label>
@@ -141,7 +198,7 @@ const handleUpload = async () => {
       <label style={labelStyle}>Metros (m²) <span style={{ color: "#c00" }}>*</span></label>
       <input
         type="text"
-        placeholder="Ej: 120"
+        placeholder="Ej: 120 x 200"
         value={metros}
         onChange={(e) => setMetros(e.target.value)}
         style={inputStyle}
@@ -164,6 +221,33 @@ const handleUpload = async () => {
         style={textareaStyle}
       />
 
+      {/* Componente de selección de imágenes */}
+      <ImageUpload 
+        selectedFiles={selectedFiles}
+        setSelectedFiles={setSelectedFiles}
+        maxImages={10}
+      />
+
+      {/* Mostrar imágenes seleccionadas */}
+      {selectedFiles.length > 0 && (
+        <div style={styles.uploadedImagesContainer}>
+          <h4 style={styles.uploadedImagesTitle}>
+            Imágenes seleccionadas ({selectedFiles.length})
+          </h4>
+          <div style={styles.uploadedImagesGrid}>
+            {selectedFiles.map((file, index) => (
+              <div key={index} style={styles.uploadedImageItem}>
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt={`Imagen ${index + 1}`}
+                  style={styles.uploadedImage}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <button
         onClick={handleUpload}
         disabled={loading}
@@ -173,7 +257,7 @@ const handleUpload = async () => {
           cursor: loading ? "not-allowed" : "pointer"
         }}
       >
-        {loading ? "Subiendo..." : "Subir Propiedad"}
+        {loading ? "Subiendo..." : `Subir Propiedad${selectedFiles.length > 0 ? ` con ${selectedFiles.length} imagen${selectedFiles.length > 1 ? 'es' : ''}` : ''}`}
       </button>
 
       {/* Modal */}
@@ -279,6 +363,39 @@ const modalContentStyle = {
   width: "90%",
   textAlign: "center",
   boxShadow: "0 8px 20px rgba(0,0,0,0.15)"
+};
+
+// Estilos para las imágenes subidas
+const styles = {
+  uploadedImagesContainer: {
+    marginTop: "20px",
+    padding: "15px",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "8px",
+    border: "1px solid #e9ecef",
+  },
+  uploadedImagesTitle: {
+    margin: "0 0 10px 0",
+    color: "#0b1f44",
+    fontSize: "16px",
+    fontWeight: "600",
+  },
+  uploadedImagesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))",
+    gap: "8px",
+  },
+  uploadedImageItem: {
+    position: "relative",
+    aspectRatio: "1",
+  },
+  uploadedImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    borderRadius: "6px",
+    border: "2px solid #e0e0e0",
+  },
 };
 
 export default AdminUpload;

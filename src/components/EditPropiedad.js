@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import usePageTitle from "../hooks/usePageTitle";
 
 const EditarPropiedad = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  usePageTitle(property?.titulo ? `Editar ${property.titulo}` : "Editar Propiedad");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 

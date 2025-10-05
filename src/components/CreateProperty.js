@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import usePageTitle from '../hooks/usePageTitle';
 
 const CreateProperty = () => {
+    usePageTitle("Crear Propiedad");
+    
     const [formData, setFormData] = useState({
         title: '',
         description: '',
