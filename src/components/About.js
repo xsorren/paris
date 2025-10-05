@@ -1,4 +1,7 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 const About = () => {
+    usePageTitle("Nosotros");
     return (
         <section
             className="about"
