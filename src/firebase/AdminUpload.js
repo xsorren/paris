@@ -16,7 +16,6 @@ const AdminUpload = () => {
   const [observacion, setObservacion] = useState("");
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true });
-  const [images, setImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [propertyId, setPropertyId] = useState("");
   const navigate = useNavigate();
@@ -50,11 +49,6 @@ const AdminUpload = () => {
 
   const closeModal = () => {
     setModal({ show: false, message: "", success: true });
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAdmin");
-    navigate("/login");
   };
 
 const handleUpload = async () => {
@@ -119,9 +113,8 @@ const handleUpload = async () => {
     setTitulo("");
     setMetros("");
     setLocalidad("");
-    setObservacion("");
-    setOperacion("venta");
-    setImages([]);
+  setObservacion("");
+  setOperacion("venta");
     setSelectedFiles([]);
     
     // Generar nuevo ID para la siguiente propiedad
