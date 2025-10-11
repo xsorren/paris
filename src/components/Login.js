@@ -36,25 +36,7 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError('');
 
-    try {
-      const result = await signInWithGoogle();
-      
-      if (result.success) {
-        setAuthSuccess(true);
-        setShowModal(true);
-      } else {
-        setError(result.error);
-      }
-    } catch (error) {
-      setError('Error al iniciar sesión con Google. Intenta nuevamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleConfirm = (mantenerSesion) => {
     if (mantenerSesion) {
       localStorage.setItem("isAdmin", "true");

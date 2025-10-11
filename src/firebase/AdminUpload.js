@@ -103,7 +103,6 @@ const handleUpload = async () => {
       localidad,
       observacion,
       operacion,
-      images: uploadedImages, // Incluir las URLs de las imágenes subidas
     };
 
     const saveResult = await saveProperty(propertyData);
@@ -139,10 +138,6 @@ const handleUpload = async () => {
 
   return (
     <div style={{
-      maxWidth: "520px",
-      margin: "40px auto",
-      padding: "30px 40px",
-      backgroundColor: "#fff",
       boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
       borderRadius: "12px",
       fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -209,7 +204,6 @@ const handleUpload = async () => {
         type="text"
         placeholder="Ej: Calle Falsa 123, CABA"
         value={localidad}
-        onChange={(e) => setLocalidad(e.target.value)}
         style={inputStyle}
       />
 

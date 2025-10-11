@@ -2,9 +2,7 @@ import { useEffect, useState } from "react"
 import banner from "../banner.jpg"
 import { Link } from "react-router-dom";
 const Banner = () => {
-    const [search, setSearch] = useState();
-    const [find, setFind] = useState([]);
-    const [word, setWord] = useState("");
+
     useEffect(() => {
         setSearch(["a","b","test", "mb"])
     }, [])

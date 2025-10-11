@@ -51,21 +51,21 @@ const BlogDetail = () => {
     setShowImageModal(false);
   };
 
-  const handlePrevImage = () => {
-    if (property.images && property.images.length > 0) {
+  const handlePrevImage = useCallback(() => {
+    if (property && property.images && property.images.length > 0) {
       setActiveImage((prev) =>
         prev === 0 ? property.images.length - 1 : prev - 1
       );
     }
-  };
+  }, [property]);
 
-  const handleNextImage = () => {
-    if (property.images && property.images.length > 0) {
+  const handleNextImage = useCallback(() => {
+    if (property && property.images && property.images.length > 0) {
       setActiveImage((prev) =>
         prev === property.images.length - 1 ? 0 : prev + 1
       );
     }
-  };
+  }, [property]);
 
   const handleStatusChange = async (newStatus) => {
     try {
