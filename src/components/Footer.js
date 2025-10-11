@@ -30,21 +30,7 @@ const Column = styled.div`
   gap: 16px;
 `;
 
-const title = styled.h4`
-  font-weight: 700;
-  font-size: 22px;
-  margin-bottom: 8px;
-  color: #ffc107;
-  border-bottom: 2px solid #ffc107;
-  padding-bottom: 5px;
-  width: fit-content;
-`;
 
-const InfoText = styled.span`
-  font-size: 15px;
-  line-height: 1.6;
-  color: #f0f0f0;
-`;
 
 const SocialIcons = styled.div`
   display: flex;

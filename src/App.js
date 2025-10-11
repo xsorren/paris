@@ -14,7 +14,7 @@ import { Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import Modal from "react-modal";
 import AdminUpload from "../src/firebase/AdminUpload";
-import { Navigate } from "react-router-dom";
+
 import RequireAdmin from "./components/RequireAdmin";
 import EditPropiedad from "./components/EditPropiedad";
 

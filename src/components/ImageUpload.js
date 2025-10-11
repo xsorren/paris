@@ -1,6 +1,6 @@
 // src/components/ImageUpload.js
 import React, { useState, useRef } from 'react';
-import { uploadMultipleImages, validateImageFiles } from '../firebase/imageUploadService';
+import { validateImageFiles } from '../firebase/imageUploadService';
 
 const ImageUpload = ({ selectedFiles, setSelectedFiles, maxImages = 10 }) => {
   const [previewUrls, setPreviewUrls] = useState([]);

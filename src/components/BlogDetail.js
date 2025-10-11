@@ -111,7 +111,7 @@ const BlogDetail = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [showImageModal]);
+  }, [showImageModal, handleNextImage, handlePrevImage]);
 
   if (loading) return <LoadingComponent />;
   if (!property) return <NotFoundComponent />;

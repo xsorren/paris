@@ -42,11 +42,7 @@ const IconWrapper = styled.div`
   color: #012161;
 `;
 
-const title = styled.h5`
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-`;
+
 
 const Text = styled.p`
   font-size: 15px;

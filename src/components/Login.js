@@ -55,34 +55,26 @@ const Login = () => {
       setLoading(false);
     }
   };
-
- const handleConfirm = (mantenerSesion) => {
-  if (mantenerSesion) {
-    localStorage.setItem("isAdmin", "true");
-  } else {
-    sessionStorage.setItem("isAdmin", "true");
-  }
-
-  localStorage.setItem("welcomeMessage", "Ahora sos administrador y podés agregar propiedades");
-  setShowModal(false);
-
-  navigate('/admin');
-  window.location.reload(); // 👈 esto soluciona que el Header lo reconozca
-};
-
+  const handleConfirm = (mantenerSesion) => {
+    if (mantenerSesion) {
+      localStorage.setItem("isAdmin", "true");
+    } else {
+      sessionStorage.setItem("isAdmin", "true");
+    }
+    localStorage.setItem("welcomeMessage", "Ahora sos administrador y podés agregar propiedades");
+    setShowModal(false);
+    navigate('/admin');
+    window.location.reload();
+  };
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.form}>
         <h2 style={styles.title}>Iniciar Sesión</h2>
         <p style={styles.subtitle}>Solo emails autorizados pueden acceder</p>
-        
         {error && (
-          <div style={styles.errorMessage}>
-            {error}
-          </div>
+          <div style={styles.errorMessage}>{error}</div>
         )}
-
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -108,12 +100,10 @@ const Login = () => {
             {loading ? 'Iniciando...' : 'Ingresar con Email'}
           </button>
         </form>
-
         <div style={styles.divider}>
           <span style={styles.dividerText}>O</span>
         </div>
       </div>
-
       {/* Modal personalizado */}
       {showModal && authSuccess && (
         <div style={styles.modalOverlay}>
