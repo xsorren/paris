@@ -187,7 +187,7 @@ const CancelBtn = styled(ModalButton)`
 
 const Login = () => {
   usePageTitle("Iniciar Sesión");
-  
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -203,8 +203,9 @@ const Login = () => {
 
     try {
       const result = await signInWithEmail(username, password);
-      
+
       if (result.success) {
+        // ✅ Login correcto → mostrar modal de confirmación
         setAuthSuccess(true);
         setShowModal(true);
       } else {
@@ -223,10 +224,16 @@ const Login = () => {
     } else {
       sessionStorage.setItem("isAdmin", "true");
     }
-    localStorage.setItem("welcomeMessage", "Ahora sos administrador y podés agregar propiedades");
+
+    localStorage.setItem(
+      "welcomeMessage",
+      "Ahora sos administrador y podés agregar propiedades"
+    );
+
     setShowModal(false);
-    navigate('/admin');
-    window.location.reload();
+
+    // ✅ Navegar directamente al panel sin recargar la página
+    navigate('/admin', { replace: true });
   };
 
   return (

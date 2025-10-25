@@ -14,6 +14,8 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showImageModal, setShowImageModal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
 
   useEffect(() => {
     // Verificar si el usuario es administrador
@@ -120,6 +122,7 @@ const BlogDetail = () => {
     <div style={styles.container}>
       <style>
         {`
+        
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -191,6 +194,10 @@ const BlogDetail = () => {
               order: 2 !important;
             }
           }
+          .imageOverlayContainer:hover .hover-overlay {
+           opacity: 1 !important;
+          }
+           
         `}
       </style>
       <h1 style={styles.title}>{property.title}</h1>
@@ -206,20 +213,42 @@ const BlogDetail = () => {
         {/* Panel izquierdo - Carrusel de imágenes */}
         <div style={styles.carouselSection} className="carousel-section">
           <div style={styles.imageContainer}>
-            <img
-              src={
-                property.images?.[activeImage]?.url ||
-                property.images?.[activeImage] ||
-                "https://via.placeholder.com/800x400?text=Sin+imagen"
-              }
-              alt="Propiedad"
-              style={styles.mainImage}
-              className="main-image"
-              onClick={handleImageClick}
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/800x400?text=Error+al+cargar";
-              }}
-            />
+            <div
+              style={styles.imageContainer}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <div style={styles.imageOverlayContainer} onClick={handleImageClick}>
+                <img
+                  src={
+                    property.images?.[activeImage]?.url ||
+                    property.images?.[activeImage] ||
+                    "https://via.placeholder.com/800x400?text=Sin+imagen"
+                  }
+                  alt="Propiedad"
+                  style={styles.mainImage}
+                  className="main-image"
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/800x400?text=Error+al+cargar";
+                  }}
+                />
+
+                {/* Overlay gris con texto */}
+                <div
+                  style={{
+                    ...styles.hoverOverlay,
+                    opacity: isHovered ? 1 : 0,
+                  }}
+                >
+                  <span style={styles.overlayText}>
+                    Ver fotos en pantalla completa
+                  </span>
+                </div>
+              </div>
+            </div>
+
+
             {/* Indicador de estado */}
             {property.estado && property.estado !== 'disponible' && (
               <div style={{
@@ -783,6 +812,40 @@ const styles = {
     fontSize: "14px",
     fontWeight: "bold",
   },
+  hoverOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    color: "#fff",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "20px",
+    fontWeight: "600",
+    textAlign: "center",
+    padding: "20px",
+    cursor: "pointer",
+    borderRadius: "10px",
+    transition: "opacity 0.3s ease",
+    opacity: 0,
+  },
+  overlayText: {
+    backgroundColor: "rgba(0,0,0,0.6)",
+    padding: "10px 20px",
+    borderRadius: "8px",
+  },
+  imageOverlayContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    borderRadius: "10px",
+    overflow: "hidden",
+  },
+
+
   // Media queries para responsive design
   '@media (max-width: 768px)': {
     content: {
