@@ -1,0 +1,247 @@
+/* ============================================================
+   ESTILOS BASE - RESET Y NORMALIZACIÓN
+   ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: var(--transition-fast);
+  transition-timing-function: ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  font-weight: var(--font-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-white);
+  line-height: 1.6;
+}
+
+/* ========== TIPOGRAFÍA BASE ========== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-bold);
+  line-height: 1.3;
+  margin-bottom: var(--space-m);
+}
+
+h1 {
+  font-size: var(--font-xxl);
+}
+
+h2 {
+  font-size: var(--font-xl);
+}
+
+h3 {
+  font-size: var(--font-lg);
+}
+
+h4 {
+  font-size: var(--font-base);
+  font-weight: var(--font-bold);
+}
+
+h5, h6 {
+  font-size: var(--font-sm);
+  font-weight: var(--font-bold);
+}
+
+p {
+  margin-bottom: var(--space-m);
+}
+
+small {
+  font-size: var(--font-xs);
+}
+
+strong {
+  font-weight: var(--font-bold);
+}
+
+em {
+  font-style: italic;
+}
+
+/* ========== ENLACES ========== */
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+a:hover {
+  color: var(--primary-light);
+}
+
+/* ========== IMÁGENES ========== */
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ========== LISTAS ========== */
+
+ul, ol {
+  margin-bottom: var(--space-m);
+  margin-left: var(--space-l);
+}
+
+li {
+  margin-bottom: var(--space-s);
+}
+
+/* ========== BOTONES GENERALES ========== */
+
+button, input[type="button"], input[type="submit"], input[type="reset"] {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  transition: all var(--transition-fast);
+}
+
+button:disabled, input[type="button"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========== INPUTS Y FORMULARIOS ========== */
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="search"],
+textarea,
+select {
+  width: 100%;
+  padding: var(--space-m) var(--space-l);
+  border: 1px solid #ddd;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-white);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(1, 33, 97, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* ========== TABLAS ========== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-l);
+}
+
+th, td {
+  padding: var(--space-m) var(--space-l);
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: var(--bg-light);
+  font-weight: var(--font-bold);
+}
+
+/* ========== CÓDIGOS Y BLOQUES ========== */
+
+code, pre {
+  background-color: var(--bg-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-s) var(--space-m);
+  font-family: 'Courier New', monospace;
+  font-size: var(--font-sm);
+}
+
+pre {
+  padding: var(--space-l);
+  overflow-x: auto;
+}
+
+/* ========== SEPARADORES ========== */
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: var(--space-xl) 0;
+}
+
+/* ========== CONTENEDORES ========== */
+
+section {
+  padding: var(--space-xxxl) var(--space-xl);
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: var(--space-xxl) var(--space-l);
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-l);
+  }
+}
+
+/* ========== VISIBILIDAD ========== */
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

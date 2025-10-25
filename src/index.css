@@ -1,17 +1,22 @@
-/*body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* ============================================================
+   IMPORTAR SISTEMA DE ESTILOS MINIMALISTA
+   ============================================================ */
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-*/
-body{
-  background: #eeeeee42;
+/* 1. Variables CSS Globales */
+@import './styles/variables.css';
+
+/* 2. Estilos Base y Reset */
+@import './styles/base.css';
+
+/* 3. Componentes Reutilizables */
+@import './styles/components.css';
+
+/* ============================================================
+   CONFIGURACIÓN DE FUENTE GLOBAL
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+body {
+  background: var(--bg-white);
 }

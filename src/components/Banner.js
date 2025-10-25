@@ -1,22 +1,63 @@
 import banner from "../banner.jpg"
+import styled from "styled-components";
+
+const BannerWrapper = styled.div`
+  min-height: 450px;
+  background-image: ${props => `url(${props.bgImage})`};
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const BannerOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(29, 34, 43, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const BannerContent = styled.div`
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 600px;
+  padding: 0 var(--space-xl);
+
+  @media (max-width: 768px) {
+    padding: 0 var(--space-l);
+  }
+`;
+
+const BannerTitle = styled.h1`
+  color: white;
+  font-size: var(--font-xxl);
+  font-weight: var(--font-bold);
+  margin: 0;
+  line-height: 1.3;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
+`;
 
 const Banner = () => {
-    return (
-        <div className="banner d-flex align-items-center" style={{ backgroundImage: `url(${banner})` }}>
-            <div className="bg-custom">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-6 mx-auto">
-                            <div className="banner-area text-center pt-4 pb-4">
-                                <h2 className="mt-2 mb-4 banner-title"><strong>Paris Negocios Inmobiliarios</strong> </h2>
-                                <p></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
+  return (
+    <BannerWrapper bgImage={banner}>
+      <BannerOverlay />
+      <BannerContent>
+        <BannerTitle>Paris Negocios Inmobiliarios</BannerTitle>
+      </BannerContent>
+    </BannerWrapper>
+  );
+};
 
 export default Banner;

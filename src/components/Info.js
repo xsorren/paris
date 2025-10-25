@@ -5,78 +5,93 @@ import { faUsers, faBuilding, faMoneyBillAlt } from '@fortawesome/free-solid-svg
 
 // Estilos
 const InfoSection = styled.section`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 20px;
-  background-color: #f8f9fa;
-  color: #012161;
-  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  padding: var(--space-xxxl) var(--space-xl);
+  background-color: var(--bg-light);
+  color: var(--primary);
+  font-family: var(--font-family);
+`;
+
+const SectionTitle = styled.h2`
+  text-align: center;
+  font-size: var(--font-xxl);
+  color: var(--primary);
+  margin-bottom: var(--space-xxl);
+  font-weight: var(--font-bold);
 `;
 
 const InfoGrid = styled.div`
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 2000px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    gap: var(--space-l);
+  }
 `;
 
 const InfoBox = styled.div`
   background-color: white;
-  border-radius: 12px;
-  padding: 30px 20px;
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
   text-align: center;
-  width: 300px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
   }
 `;
 
 const IconWrapper = styled.div`
-  margin-bottom: 15px;
-  color: #012161;
+  margin-bottom: var(--space-l);
+  color: var(--primary);
+  font-size: 32px;
 `;
 
-
+const BoxTitle = styled.h3`
+  font-size: var(--font-lg);
+  color: var(--primary);
+  margin-bottom: var(--space-m);
+  font-weight: var(--font-bold);
+`;
 
 const Text = styled.p`
-  font-size: 15px;
-  color: #444;
-  margin-top: 10px;
-  line-height: 1.4;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
 `;
 
 const Info = () => {
   return (
     <InfoSection>
+      <SectionTitle>Nuestros Servicios</SectionTitle>
       <InfoGrid>
         <InfoBox>
           <IconWrapper>
-            <FontAwesomeIcon icon={faUsers} size="2x" />
+            <FontAwesomeIcon icon={faUsers} />
           </IconWrapper>
-          <title>{process.env.REACT_APP_INFO_SERVICE_1}</title>
-          <Text>Tasaciones y asesoramiento</Text>
+          <BoxTitle>{process.env.REACT_APP_INFO_SERVICE_1}</BoxTitle>
+          <Text>Tasaciones y asesoramiento profesional para tus inversiones inmobiliarias</Text>
         </InfoBox>
 
         <InfoBox>
           <IconWrapper>
-            <FontAwesomeIcon icon={faBuilding} size="2x" />
+            <FontAwesomeIcon icon={faBuilding} />
           </IconWrapper>
-          <title>{process.env.REACT_APP_INFO_SERVICE_2}</title>
-          <Text>Casas, Departamentos, lotes y más</Text>
+          <BoxTitle>{process.env.REACT_APP_INFO_SERVICE_2}</BoxTitle>
+          <Text>Casas, departamentos, lotes y más inmuebles de calidad</Text>
         </InfoBox>
 
         <InfoBox>
           <IconWrapper>
-            <FontAwesomeIcon icon={faMoneyBillAlt} size="2x" />
+            <FontAwesomeIcon icon={faMoneyBillAlt} />
           </IconWrapper>
-          <title>{process.env.REACT_APP_INFO_SERVICE_3}</title>
-          <Text>Propiedades en Navarro y alrededores</Text>
+          <BoxTitle>{process.env.REACT_APP_INFO_SERVICE_3}</BoxTitle>
+          <Text>Propiedades en Navarro y sus alrededores</Text>
         </InfoBox>
       </InfoGrid>
     </InfoSection>

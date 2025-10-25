@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { deleteProperty, updatePropertyStatus } from "../firebase/propertyService";
 import { isUserAuthorized } from "../firebase/authService";
 import usePageTitle from "../hooks/usePageTitle";
+import styled from "styled-components";
 
 const Blog = () => {
   usePageTitle("Propiedades");
 
+  const navigate = useNavigate();
   const [propiedades, setPropiedades] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,10 @@ const Blog = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const propertiesPerPage = 9;
 
   useEffect(() => {
     // Verificar si el usuario es administrador
@@ -43,6 +49,7 @@ const Blog = () => {
 
   const filtrarPorTipo = (tipo) => {
     setFiltroActivo(tipo);
+    setCurrentPage(1); // Reset a primera página
     if (tipo === "todas") {
       setFiltered(propiedades);
     } else {
@@ -55,6 +62,7 @@ const Blog = () => {
 
   const filtrarPorOperacion = (tipoOperacion) => {
     setFiltroActivo(tipoOperacion);
+    setCurrentPage(1); // Reset a primera página
     const filtradas = propiedades.filter(
       (prop) => prop.operacion?.toLowerCase() === tipoOperacion.toLowerCase()
     );
@@ -116,600 +124,884 @@ const Blog = () => {
     }
   };
 
-  return (
-    <div style={styles.container}>
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          
-          @keyframes bounce {
-            0%, 80%, 100% {
-              transform: scale(0);
-            }
-            40% {
-              transform: scale(1);
-            }
-          }
-          
-          @keyframes pulse {
-            0% {
-              transform: scale(1);
-              opacity: 1;
-            }
-            50% {
-              transform: scale(1.02);
-              opacity: 0.7;
-            }
-            100% {
-              transform: scale(1);
-              opacity: 1;
-            }
-          }
-          
-          @keyframes shimmer {
-            0% {
-              background-position: -200px 0;
-            }
-            100% {
-              background-position: calc(200px + 100%) 0;
-            }
-          }
-          
-          .dot:nth-child(1) {
-            animation-delay: -0.32s;
-          }
-          
-          .dot:nth-child(2) {
-            animation-delay: -0.16s;
-          }
-          
-          .property-card:hover .delete-button {
-            opacity: 1 !important;
-            transform: scale(1) !important;
-          }
-          .property-card:hover .property-image {
-            transform: scale(1.05);
-          }
-          .delete-button:hover {
-            background-color: rgba(220, 53, 69, 1) !important;
-            transform: scale(1.1) !important;
-          }
-        `}
-      </style>
-      <h1 style={styles.title}>
-        <span style={styles.highlight}>Propiedades</span> disponibles
-      </h1>
-      <div style={styles.separator}></div>
+  const handleCardClick = (propertyId, e) => {
+    // Evitar navegación si se clickeó un botón
+    if (e.target.closest('button')) {
+      return;
+    }
+    navigate(`/blog/${propertyId}`);
+  };
 
-      <div style={styles.filterButtons}>
+  // Lógica de paginación
+  const indexOfLastProperty = currentPage * propertiesPerPage;
+  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
+  const currentProperties = filtered.slice(indexOfFirstProperty, indexOfLastProperty);
+  const totalPages = Math.ceil(filtered.length / propertiesPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <Container>
+      <PageHeader>
+        <PageTitle>
+          <span>Propiedades</span> disponibles
+        </PageTitle>
+        <ResultCount>{filtered.length} propiedades encontradas</ResultCount>
+      </PageHeader>
+
+      <FilterSection>
         {["todas", "casa", "departamento", "lote"].map((tipo) => (
-          <button
+          <FilterButton
             key={tipo}
-            style={{
-              ...styles.filterButton,
-              backgroundColor: filtroActivo === tipo ? "#184a8e" : "#ddd",
-              color: filtroActivo === tipo ? "#fff" : "#333",
-            }}
+            active={filtroActivo === tipo}
             onClick={() => filtrarPorTipo(tipo)}
           >
             {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-          </button>
+          </FilterButton>
         ))}
 
-        <button
-          style={{
-            ...styles.filterButton,
-            backgroundColor: filtroActivo === "venta" ? "#184a8e" : "#ddd",
-            color: filtroActivo === "venta" ? "#fff" : "#333",
-          }}
+        <FilterButton
+          active={filtroActivo === "venta"}
           onClick={() => filtrarPorOperacion("venta")}
         >
           En Venta
-        </button>
+        </FilterButton>
 
-        <button
-          style={{
-            ...styles.filterButton,
-            backgroundColor: filtroActivo === "alquiler" ? "#184a8e" : "#ddd",
-            color: filtroActivo === "alquiler" ? "#fff" : "#333",
-          }}
+        <FilterButton
+          active={filtroActivo === "alquiler"}
           onClick={() => filtrarPorOperacion("alquiler")}
         >
           En Alquiler
-        </button>
-      </div>
+        </FilterButton>
+      </FilterSection>
 
       {loading ? (
         <LoadingPropertiesComponent />
+      ) : filtered.length === 0 ? (
+        <EmptyState>
+          <EmptyIcon>🏠</EmptyIcon>
+          <EmptyTitle>No se encontraron propiedades</EmptyTitle>
+          <EmptyText>Intenta cambiar los filtros para ver más resultados</EmptyText>
+        </EmptyState>
       ) : (
-        <div style={styles.grid}>
-          {filtered.map((property) => (
-            <div key={property.id} style={styles.card} className="property-card">
-              <div style={styles.imageContainer}>
-                <img
-                  src={property.images?.[0]?.url || "https://via.placeholder.com/400x300?text=Sin+imagen"}
-                  alt={property.titulo}
-                  style={styles.image}
-                  className="property-image"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/400x300?text=Error+al+cargar";
-                  }}
-                />
+        <>
+          <PropertiesGrid>
+            {currentProperties.map((property) => (
+              <PropertyCard 
+                key={property.id}
+                onClick={(e) => handleCardClick(property.id, e)}
+              >
+                <ImageContainer>
+                  <PropertyImage
+                    src={property.images?.[0]?.url || "https://via.placeholder.com/400x300?text=Sin+imagen"}
+                    alt={property.titulo}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/400x300?text=Error+al+cargar";
+                    }}
+                  />
 
-                {/* Indicador de estado */}
-                {property.estado && property.estado !== 'disponible' && (
-                  <div style={{
-                    ...styles.statusIndicator,
-                    backgroundColor: property.estado === 'vendida' ? '#dc3545' : '#ffc107',
-                    color: property.estado === 'vendida' ? '#fff' : '#000'
-                  }}>
-                    {property.estado === 'vendida' ? 'VENDIDA' : 'ALQUILADA'}
-                  </div>
-                )}
+                  {/* Badge de estado */}
+                  {property.estado && property.estado !== 'disponible' && (
+                    <StatusBadge status={property.estado}>
+                      {property.estado === 'vendida' ? 'VENDIDA' : 'ALQUILADA'}
+                    </StatusBadge>
+                  )}
 
-                {/* Indicador de cantidad de imágenes */}
-                {property.images && property.images.length > 0 && (
-                  <div style={styles.imageCounter}>
-                    📷 {property.images.length}
-                  </div>
-                )}
+                  {/* Contador de imágenes */}
+                  {property.images && property.images.length > 0 && (
+                    <ImageCounter>
+                      📷 {property.images.length}
+                    </ImageCounter>
+                  )}
 
-                {isAdmin && (
-                  <button
-                    style={styles.deleteButton}
-                    className="delete-button"
-                    onClick={() => handleDeleteClick(property)}
-                    title="Eliminar propiedad"
-                  >
-                    🗑️
-                  </button>
-                )}
-              </div>
-              <div style={styles.content}>
-                <h3 style={styles.propertytitle}>
-                  <Link to={`/blog/${property.id}`} style={styles.link}>
-                    {property.titulo}
-                  </Link>
-                </h3>
-                <p><strong>Título:</strong> {property.titulo}</p>
-                <p><strong>Ubicación:</strong> {property.localidad}</p>
-                <p><strong>Metros:</strong> {property.metros}</p>
-                <p><strong>Estado:</strong> {property.estado || 'Disponible'}</p>
-                <Link to={`/blog/${property.id}`} style={styles.button}>
-                  Ver Detalles
-                </Link>
-
-                {/* Botones de cambio de estado para admin */}
-                {isAdmin && (
-                  <div style={styles.statusButtons}>
-                    <button
-                      style={{
-                        ...styles.statusButton,
-                        backgroundColor: property.estado === 'vendida' ? '#28a745' : '#dc3545'
+                  {/* Botón eliminar (solo admin) */}
+                  {isAdmin && (
+                    <DeleteButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(property);
                       }}
-                      onClick={() => handleStatusChange(property.id, property.estado === 'vendida' ? 'disponible' : 'vendida')}
-                      title={property.estado === 'vendida' ? 'Marcar como disponible' : 'Marcar como vendida'}
+                      title="Eliminar propiedad"
                     >
-                      {property.estado === 'vendida' ? ' Marcar como Disponible' : ' Marcar como Vendida'}
-                    </button>
-                    <button
-                      style={{
-                        ...styles.statusButton,
-                        backgroundColor: property.estado === 'alquilada' ? '#28a745' : '#ffc107',
-                        color: property.estado === 'alquilada' ? '#fff' : '#000'
-                      }}
-                      onClick={() => handleStatusChange(property.id, property.estado === 'alquilada' ? 'disponible' : 'alquilada')}
-                      title={property.estado === 'alquilada' ? 'Marcar como disponible' : 'Marcar como alquilada'}
-                    >
-                      {property.estado === 'alquilada' ? 'Marcar como Disponible' : 'Marcar como Alquilada'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+                      🗑️
+                    </DeleteButton>
+                  )}
+                </ImageContainer>
+
+                <CardContent>
+                  <PropertyTitle>{property.titulo}</PropertyTitle>
+                  
+                  <PropertyInfo>
+                    <InfoItem>
+                      <InfoIcon>📍</InfoIcon>
+                      <InfoText>{property.localidad}</InfoText>
+                    </InfoItem>
+                    <InfoItem>
+                      <InfoIcon>📏</InfoIcon>
+                      <InfoText>{property.metros} m²</InfoText>
+                    </InfoItem>
+                    <InfoItem>
+                      <InfoIcon>🏷️</InfoIcon>
+                      <InfoText>{property.categoria}</InfoText>
+                    </InfoItem>
+                  </PropertyInfo>
+
+                  <ViewDetailsButton>
+                    Ver Detalles →
+                  </ViewDetailsButton>
+
+                  {/* Botones de admin */}
+                  {isAdmin && (
+                    <AdminActions onClick={(e) => e.stopPropagation()}>
+                      <StatusToggleButton
+                        status="vendida"
+                        active={property.estado === 'vendida'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(property.id, property.estado === 'vendida' ? 'disponible' : 'vendida');
+                        }}
+                      >
+                        {property.estado === 'vendida' ? '✓ Vendida' : 'Marcar Vendida'}
+                      </StatusToggleButton>
+                      <StatusToggleButton
+                        status="alquilada"
+                        active={property.estado === 'alquilada'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(property.id, property.estado === 'alquilada' ? 'disponible' : 'alquilada');
+                        }}
+                      >
+                        {property.estado === 'alquilada' ? '✓ Alquilada' : 'Marcar Alquilada'}
+                      </StatusToggleButton>
+                    </AdminActions>
+                  )}
+                </CardContent>
+              </PropertyCard>
+            ))}
+          </PropertiesGrid>
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <PaginationContainer>
+              <PaginationButton
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                ← Anterior
+              </PaginationButton>
+
+              <PageNumbers>
+                {[...Array(totalPages)].map((_, index) => {
+                  const pageNumber = index + 1;
+                  // Mostrar solo páginas cercanas a la actual
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                  ) {
+                    return (
+                      <PageNumber
+                        key={pageNumber}
+                        active={currentPage === pageNumber}
+                        onClick={() => paginate(pageNumber)}
+                      >
+                        {pageNumber}
+                      </PageNumber>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 2 ||
+                    pageNumber === currentPage + 2
+                  ) {
+                    return <PageDots key={pageNumber}>...</PageDots>;
+                  }
+                  return null;
+                })}
+              </PageNumbers>
+
+              <PaginationButton
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente →
+              </PaginationButton>
+            </PaginationContainer>
+          )}
+        </>
       )}
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && propertyToDelete && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <h3 style={styles.modalTitle}>¿Eliminar Propiedad?</h3>
-            <div style={styles.modalContent}>
-              <img
+        <ModalOverlay onClick={handleCancelDelete}>
+          <Modal onClick={(e) => e.stopPropagation()}>
+            <ModalTitle>¿Eliminar Propiedad?</ModalTitle>
+            <ModalContent>
+              <ModalImage
                 src={propertyToDelete.images?.[0]?.url || "https://via.placeholder.com/200x150?text=Sin+imagen"}
                 alt={propertyToDelete.titulo}
-                style={styles.modalImage}
                 onError={(e) => {
                   e.target.src = "https://via.placeholder.com/200x150?text=Error+al+cargar";
                 }}
               />
-              <div style={styles.modalDetails}>
-                <h4 style={styles.modalPropertyTitle}>{propertyToDelete.titulo}</h4>
+              <ModalDetails>
+                <ModalPropertyTitle>{propertyToDelete.titulo}</ModalPropertyTitle>
                 <p><strong>Tipo:</strong> {propertyToDelete.categoria}</p>
                 <p><strong>Operación:</strong> {propertyToDelete.operacion}</p>
                 <p><strong>Ubicación:</strong> {propertyToDelete.localidad}</p>
                 <p><strong>Metros:</strong> {propertyToDelete.metros} m²</p>
-                {propertyToDelete.observacion && (
-                  <p><strong>Observaciones:</strong> {propertyToDelete.observacion}</p>
-                )}
-                <p style={styles.warningText}>
+                <WarningText>
                   ⚠️ Esta acción no se puede deshacer
-                </p>
-              </div>
-            </div>
-            <div style={styles.modalButtons}>
-              <button
-                style={styles.cancelButton}
+                </WarningText>
+              </ModalDetails>
+            </ModalContent>
+            <ModalButtons>
+              <CancelButton
                 onClick={handleCancelDelete}
                 disabled={deleting}
               >
                 Cancelar
-              </button>
-              <button
-                style={styles.confirmDeleteButton}
+              </CancelButton>
+              <ConfirmDeleteButton
                 onClick={handleConfirmDelete}
                 disabled={deleting}
               >
                 {deleting ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
+              </ConfirmDeleteButton>
+            </ModalButtons>
+          </Modal>
+        </ModalOverlay>
       )}
-    </div>
+    </Container>
   );
 };
 
-const styles = {
-  container: {
-    padding: "40px 20px",
-    maxWidth: "2000px",
-    margin: "0 auto",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "10px",
-    fontSize: "38px",
-    fontWeight: "700",
-    color: "#0b1f44",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    letterSpacing: "1px",
-  },
-  highlight: {
-    color: "#184a8e",
-  },
-  separator: {
-    width: "80px",
-    height: "4px",
-    backgroundColor: "#184a8e",
-    margin: "10px auto 30px",
-    borderRadius: "2px",
-  },
-  filterButtons: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "15px",
-    marginBottom: "30px",
-  },
-  filterButton: {
-    padding: "10px 20px",
-    fontSize: "16px",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-  },
-  loading: {
-    textAlign: "center",
-    fontSize: "18px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: "30px",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    overflow: "hidden",
-    transition: "transform 0.2s",
-    position: "relative",
-  },
-  imageContainer: {
-    position: "relative",
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: "220px",
-    objectFit: "cover",
-    transition: "transform 0.3s ease",
-  },
-  imageCounter: {
-    position: "absolute",
-    top: "10px",
-    left: "10px",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    color: "white",
-    padding: "4px 8px",
-    borderRadius: "12px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-  },
-  statusIndicator: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    textAlign: "center",
-    padding: "10px 0",
-    fontSize: "20px",
-    fontWeight: "bold",
-    color: "#fff",
-    backgroundColor: "rgba(0,0,0,0.6)",
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-    zIndex: 2,
-  },
-  deleteButton: {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    backgroundColor: "rgba(220, 53, 69, 0.9)",
-    color: "white",
-    border: "none",
-    borderRadius: "50%",
-    width: "40px",
-    height: "40px",
-    fontSize: "16px",
-    cursor: "pointer",
-    opacity: 0,
-    transform: "scale(0.8)",
-    transition: "all 0.3s ease",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-  },
-  content: {
-    padding: "20px",
-  },
-  propertytitle: {
-    fontSize: "20px",
-    marginBottom: "10px",
-    color: "#2c3e50",
-  },
-  link: {
-    textDecoration: "none",
-    color: "#2c3e50",
-  },
-  description: {
-    marginTop: "10px",
-    fontStyle: "italic",
-    color: "#555",
-  },
-  button: {
-    display: "inline-block",
-    marginTop: "15px",
-    padding: "10px 16px",
-    backgroundColor: "#012161",
-    color: "#fff",
-    textDecoration: "none",
-    borderRadius: "5px",
-    fontWeight: "bold",
-    fontSize: "14px",
-  },
-  statusButtons: {
-    display: "flex",
-    gap: "8px",
-    marginTop: "10px",
-    flexWrap: "wrap",
-  },
-  statusButton: {
-    padding: "6px 12px",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "12px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    flex: "1",
-    minWidth: "80px",
-  },
-  // Estilos del modal
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-  modal: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "30px",
-    maxWidth: "500px",
-    width: "90%",
-    maxHeight: "80vh",
-    overflow: "auto",
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
-  },
-  modalTitle: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "#dc3545",
-    marginBottom: "20px",
-    textAlign: "center",
-  },
-  modalContent: {
-    display: "flex",
-    gap: "20px",
-    marginBottom: "25px",
-  },
-  modalImage: {
-    width: "150px",
-    height: "120px",
-    objectFit: "cover",
-    borderRadius: "8px",
-    flexShrink: 0,
-  },
-  modalDetails: {
-    flex: 1,
-  },
-  modalPropertyTitle: {
-    fontSize: "18px",
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: "10px",
-  },
-  modalButtons: {
-    display: "flex",
-    gap: "15px",
-    justifyContent: "center",
-  },
-  cancelButton: {
-    padding: "12px 24px",
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    transition: "background-color 0.3s ease",
-  },
-  confirmDeleteButton: {
-    padding: "12px 24px",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    transition: "background-color 0.3s ease",
-  },
-  warningText: {
-    color: "#dc3545",
-    fontWeight: "bold",
-    fontSize: "14px",
-    marginTop: "15px",
-    padding: "10px",
-    backgroundColor: "#f8d7da",
-    borderRadius: "4px",
-    border: "1px solid #f5c6cb",
-  },
-  // Estilos para componente de carga de propiedades
-  loadingContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "60px 20px",
-    backgroundColor: "#f9f9f9",
-  },
-  loadingContent: {
-    textAlign: "center",
-    maxWidth: "600px",
-    padding: "40px",
-    backgroundColor: "#fff",
-    borderRadius: "20px",
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-    border: "1px solid #e9ecef",
-  },
-  spinnerContainer: {
-    marginBottom: "30px",
-  },
-  spinner: {
-    width: "60px",
-    height: "60px",
-    border: "4px solid #f3f3f3",
-    borderTop: "4px solid #184a8e",
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-    margin: "0 auto",
-  },
-  loadingTitle: {
-    fontSize: "24px",
-    fontWeight: "700",
-    color: "#2c3e50",
-    marginBottom: "10px",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  },
-  loadingSubtitle: {
-    fontSize: "16px",
-    color: "#6c757d",
-    marginBottom: "30px",
-    lineHeight: "1.5",
-  },
-  loadingDots: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "8px",
-    marginBottom: "40px",
-  },
-  dot: {
-    width: "8px",
-    height: "8px",
-    backgroundColor: "#184a8e",
-    borderRadius: "50%",
-    animation: "bounce 1.4s ease-in-out infinite both",
-  },
-  loadingProperties: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "20px",
-    marginTop: "20px",
-  },
-  propertySkeleton: {
-    height: "200px",
-    background: "linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)",
-    backgroundSize: "200px 100%",
-    borderRadius: "10px",
-    animation: "shimmer 1.5s ease-in-out infinite",
-    position: "relative",
-    overflow: "hidden",
-  },
-};
+// Styled Components
+const Container = styled.div`
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: var(--space-xxxl) var(--space-l);
+  width: 100%;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: var(--space-xl) var(--space-m);
+  }
+`;
 
-// Componente de carga profesional para propiedades
+const PageHeader = styled.div`
+  text-align: center;
+  margin-bottom: var(--space-xxxl);
+`;
+
+const PageTitle = styled.h1`
+  font-size: var(--font-xxl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-m);
+  
+  span {
+    color: var(--primary);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: var(--font-xl);
+  }
+`;
+
+const ResultCount = styled.p`
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+`;
+
+const FilterSection = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-m);
+  margin-bottom: var(--space-xxxl);
+`;
+
+const FilterButton = styled.button`
+  padding: var(--space-m) var(--space-xl);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  border: 2px solid ${props => props.active ? 'var(--primary)' : 'var(--bg-lighter)'};
+  background-color: ${props => props.active ? 'var(--primary)' : 'var(--bg-white)'};
+  color: ${props => props.active ? 'var(--bg-white)' : 'var(--text-primary)'};
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+  }
+`;
+
+const PropertiesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-l);
+  margin-bottom: var(--space-xxxl);
+  justify-items: center;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--space-l);
+  }
+`;
+
+const PropertyCard = styled.div`
+  background: var(--bg-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+`;
+
+const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  background-color: var(--bg-lighter);
+`;
+
+const PropertyImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-base);
+  
+  ${PropertyCard}:hover & {
+    transform: scale(1.08);
+  }
+`;
+
+const StatusBadge = styled.div`
+  position: absolute;
+  top: var(--space-l);
+  left: var(--space-l);
+  background-color: ${props => props.status === 'vendida' ? 'var(--error)' : 'var(--warning)'};
+  color: ${props => props.status === 'vendida' ? 'var(--bg-white)' : 'var(--text-primary)'};
+  padding: var(--space-s) var(--space-l);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-md);
+`;
+
+const ImageCounter = styled.div`
+  position: absolute;
+  bottom: var(--space-l);
+  right: var(--space-l);
+  background-color: rgba(0, 0, 0, 0.75);
+  color: var(--bg-white);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+`;
+
+const DeleteButton = styled.button`
+  position: absolute;
+  top: var(--space-l);
+  right: var(--space-l);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: none;
+  background-color: var(--error);
+  color: var(--bg-white);
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  
+  ${PropertyCard}:hover & {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  &:hover {
+    transform: scale(1.1) !important;
+    background-color: #c82333;
+  }
+`;
+
+const CardContent = styled.div`
+  padding: var(--space-xl);
+`;
+
+const PropertyTitle = styled.h3`
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-l);
+  line-height: 1.3;
+  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+const PropertyInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+  margin-bottom: var(--space-l);
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+`;
+
+const InfoIcon = styled.span`
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+`;
+
+const InfoText = styled.span`
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+`;
+
+const ViewDetailsButton = styled.div`
+  display: inline-block;
+  width: 100%;
+  padding: var(--space-m) var(--space-l);
+  background-color: var(--primary);
+  color: var(--bg-white);
+  text-align: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: var(--primary-light);
+  }
+`;
+
+const AdminActions = styled.div`
+  display: flex;
+  gap: var(--space-s);
+  margin-top: var(--space-l);
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--bg-lighter);
+`;
+
+const StatusToggleButton = styled.button`
+  flex: 1;
+  padding: var(--space-s) var(--space-m);
+  font-size: var(--font-xs);
+  font-weight: var(--font-semibold);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  background-color: ${props => {
+    if (props.active) return 'var(--success)';
+    if (props.status === 'vendida') return 'var(--error)';
+    if (props.status === 'alquilada') return 'var(--warning)';
+    return 'var(--bg-lighter)';
+  }};
+  
+  color: ${props => {
+    if (props.active) return 'var(--bg-white)';
+    if (props.status === 'vendida') return 'var(--bg-white)';
+    if (props.status === 'alquilada') return 'var(--text-primary)';
+    return 'var(--text-secondary)';
+  }};
+  
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+`;
+
+// Paginación
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-l);
+  margin-top: var(--space-xxxl);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+`;
+
+const PageNumbers = styled.div`
+  display: flex;
+  gap: var(--space-s);
+  align-items: center;
+`;
+
+const PageNumber = styled.button`
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 2px solid ${props => props.active ? 'var(--primary)' : 'var(--bg-lighter)'};
+  background-color: ${props => props.active ? 'var(--primary)' : 'var(--bg-white)'};
+  color: ${props => props.active ? 'var(--bg-white)' : 'var(--text-primary)'};
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  &:hover:not(:disabled) {
+    border-color: var(--primary);
+    transform: scale(1.1);
+  }
+`;
+
+const PageDots = styled.span`
+  color: var(--text-secondary);
+  font-weight: var(--font-bold);
+  padding: 0 var(--space-s);
+`;
+
+const PaginationButton = styled.button`
+  padding: var(--space-m) var(--space-xl);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  border: 2px solid var(--primary);
+  background-color: var(--bg-white);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  &:hover:not(:disabled) {
+    background-color: var(--primary);
+    color: var(--bg-white);
+  }
+  
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: var(--bg-lighter);
+    color: var(--text-muted);
+  }
+`;
+
+// Estado vacío
+const EmptyState = styled.div`
+  text-align: center;
+  padding: var(--space-xxxl);
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 64px;
+  margin-bottom: var(--space-l);
+`;
+
+const EmptyTitle = styled.h3`
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-m);
+`;
+
+const EmptyText = styled.p`
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+`;
+
+// Modal
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const Modal = styled.div`
+  background-color: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxxl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: var(--shadow-lg);
+`;
+
+const ModalTitle = styled.h3`
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--error);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+`;
+
+const ModalContent = styled.div`
+  display: flex;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const ModalImage = styled.img`
+  width: 150px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 200px;
+  }
+`;
+
+const ModalDetails = styled.div`
+  flex: 1;
+  
+  p {
+    margin-bottom: var(--space-s);
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+  }
+  
+  strong {
+    color: var(--text-primary);
+  }
+`;
+
+const ModalPropertyTitle = styled.h4`
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-m);
+`;
+
+const WarningText = styled.p`
+  color: var(--error);
+  font-weight: var(--font-bold);
+  font-size: var(--font-sm);
+  margin-top: var(--space-l);
+  padding: var(--space-m);
+  background-color: #f8d7da;
+  border-radius: var(--radius-sm);
+  border: 1px solid #f5c6cb;
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  gap: var(--space-l);
+  justify-content: center;
+`;
+
+const CancelButton = styled.button`
+  padding: var(--space-m) var(--space-xl);
+  background-color: var(--text-secondary);
+  color: var(--bg-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: #5a6268;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const ConfirmDeleteButton = styled.button`
+  padding: var(--space-m) var(--space-xl);
+  background-color: var(--error);
+  color: var(--bg-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: #c82333;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+// Loading Component - Mantener el existente
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: var(--bg-lighter);
+  border-radius: var(--radius-lg);
+`;
+
+const LoadingContent = styled.div`
+  text-align: center;
+  max-width: 600px;
+  padding: var(--space-xxxl);
+  background-color: var(--bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+`;
+
+const SpinnerContainer = styled.div`
+  margin-bottom: var(--space-xxxl);
+`;
+
+const Spinner = styled.div`
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--bg-lighter);
+  border-top: 4px solid var(--primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingTitle = styled.h2`
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-m);
+`;
+
+const LoadingSubtitle = styled.p`
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xxxl);
+  line-height: 1.5;
+`;
+
+const LoadingDots = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: var(--space-m);
+  margin-bottom: var(--space-xxxl);
+`;
+
+const Dot = styled.span`
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: var(--radius-full);
+  animation: bounce 1.4s ease-in-out infinite both;
+  
+  &:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  
+  &:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+  
+  @keyframes bounce {
+    0%, 80%, 100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
+  }
+`;
+
+const LoadingProperties = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+`;
+
+const PropertySkeleton = styled.div`
+  height: 200px;
+  background: linear-gradient(90deg, var(--bg-lighter) 25%, #e0e0e0 50%, var(--bg-lighter) 75%);
+  background-size: 200px 100%;
+  border-radius: var(--radius-md);
+  animation: shimmer 1.5s ease-in-out infinite;
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+`;
+
 const LoadingPropertiesComponent = () => {
   return (
-    <div style={styles.loadingContainer}>
-      <div style={styles.loadingContent}>
-        <div style={styles.spinnerContainer}>
-          <div style={styles.spinner}></div>
-        </div>
-        <h2 style={styles.loadingTitle}>Cargando Propiedades</h2>
-        <p style={styles.loadingSubtitle}>Buscando las mejores propiedades para ti...</p>
-        <div style={styles.loadingDots}>
-          <span style={styles.dot}></span>
-          <span style={styles.dot}></span>
-          <span style={styles.dot}></span>
-        </div>
-        <div style={styles.loadingProperties}>
-          <div style={styles.propertySkeleton}></div>
-          <div style={styles.propertySkeleton}></div>
-          <div style={styles.propertySkeleton}></div>
-        </div>
-      </div>
-    </div>
+    <LoadingContainer>
+      <LoadingContent>
+        <SpinnerContainer>
+          <Spinner />
+        </SpinnerContainer>
+        <LoadingTitle>Cargando Propiedades</LoadingTitle>
+        <LoadingSubtitle>Buscando las mejores propiedades para ti...</LoadingSubtitle>
+        <LoadingDots>
+          <Dot />
+          <Dot />
+          <Dot />
+        </LoadingDots>
+        <LoadingProperties>
+          <PropertySkeleton />
+          <PropertySkeleton />
+          <PropertySkeleton />
+        </LoadingProperties>
+      </LoadingContent>
+    </LoadingContainer>
   );
 };
 

@@ -4,49 +4,55 @@ import styled from "styled-components";
 
 // Estilos
 const HeaderWrapper = styled.header`
-  background-color: #0b1f44;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  padding: 10px 24px;
+  background-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-s) var(--space-xl);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: var(--z-header);
 `;
 
 const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
 const Logo = styled.img`
-  height: 80px;
+  height: 60px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5));
-  transition: all 0.3s ease;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.15));
+  transition: all var(--transition-fast);
+
+  &:hover {
+    transform: scale(1.02);
+  }
 
   @media (max-width: 768px) {
-    height: 60px;
+    height: 50px;
   }
 `;
 
 const NavbarMenu = styled.ul`
   display: flex;
-  gap: 25px;
+  gap: var(--space-xl);
   list-style: none;
   align-items: center;
 
   @media (max-width: 768px) {
     position: fixed;
-    top: 70px;
+    top: 60px;
     right: ${({ open }) => (open ? "0" : "-100%")};
-    background-color: #0b1f44;
-    height: calc(100vh - 70px);
+    background-color: var(--primary);
+    height: calc(100vh - 60px);
     width: 250px;
     flex-direction: column;
-    padding: 30px 20px;
-    transition: right 0.3s ease-in-out;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+    padding: var(--space-xl) var(--space-l);
+    transition: right var(--transition-base);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -55,15 +61,20 @@ const NavbarItem = styled.li``;
 const NavbarLink = styled(Link)`
   text-decoration: none;
   color: #f0f0f0;
-  font-weight: 600;
-  font-size: 18px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
+  font-weight: var(--font-bold);
+  font-size: var(--font-sm);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
 
   &:hover {
-    background-color: #184a8e;
+    background-color: var(--primary-light);
     color: #fff;
+  }
+
+  @media (max-width: 768px) {
+    font-size: var(--font-base);
+    padding: var(--space-m) var(--space-s);
   }
 `;
 
@@ -71,14 +82,14 @@ const Hamburger = styled.div`
   display: none;
   flex-direction: column;
   cursor: pointer;
-  gap: 6px;
+  gap: var(--space-s);
 
   span {
-    height: 3px;
-    width: 25px;
+    height: 2px;
+    width: 24px;
     background: #f0f0f0;
     border-radius: 2px;
-    transition: 0.3s;
+    transition: all var(--transition-fast);
   }
 
   @media (max-width: 768px) {
@@ -89,34 +100,43 @@ const Hamburger = styled.div`
 // Badge de admin y cerrar sesión
 const AdminContainer = styled.div`
   position: fixed;
-  bottom: 15px;
-  right: 15px;
+  bottom: var(--space-l);
+  right: var(--space-l);
   text-align: right;
-  z-index: 9999;
+  z-index: var(--z-modal);
 `;
 
 const AdminBadge = styled.div`
-  background-color: #184a8e;
+  background-color: var(--primary-light);
   color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  font-weight: var(--font-bold);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
-  font-family: Arial, sans-serif;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background-color: var(--primary);
+  }
 `;
 
 const LogoutButton = styled.button`
-  margin-top: 8px;
-  background-color: #b71c1c;
+  margin-top: var(--space-s);
+  background-color: var(--error);
   color: white;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: var(--font-bold);
+  font-size: var(--font-xs);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background-color: #c82333;
+  }
 `;
 
 const Header = () => {
