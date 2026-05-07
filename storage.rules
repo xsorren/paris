@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Permitir lectura de imágenes para todos los usuarios
+    match /images/{allPaths=**} {
+      allow read: if true;
+      // Permitir escritura solo al administrador autorizado
+      allow write: if request.auth != null && request.auth.token.email == 'parispropiedadesinfo@gmail.com'
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Reglas para otros posibles archivos (restringido por defecto)
+    match /{allPaths=**} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

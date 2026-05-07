@@ -1,20 +1,20 @@
-import FlatList from "./FlatList"
-import Banner from "./Banner"
-import React from "react"
-import TeamList from "./TeamList"
-import References from "./References"
-import Subscribe from "./Subscribe"
-import Map from "./Map"
-import Info from "./Info"
+import React from "react";
+import Banner from "./Banner";
+import Info from "./Info";
 
-const Home=()=>{
+import Map from "./Map";
+import usePageTitle from "../hooks/usePageTitle";
+
+const Home = () => {
+    usePageTitle("Inicio");
+    
     return (
         <React.Fragment>
-            <Banner/>
-            <Info />    
+            <Banner />
+            <Info />
             <Map />
         </React.Fragment>
-    )
-}
+    );
+};
 
 export default Home;
