@@ -139,7 +139,6 @@ const AdminUpload = () => {
         images: uploadedImages, // ✅ Ahora guardamos el array correctamente
         createdAt: new Date().toISOString(),
         propertyId,
-        precio,
       };
 
       // 🧠 Guardar en Firestore

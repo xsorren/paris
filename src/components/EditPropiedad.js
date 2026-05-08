@@ -44,11 +44,6 @@ const EditarPropiedad = () => {
     setProperty({ ...property, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (index, value) => {
-    const updatedImages = [...(property.images || [])];
-    updatedImages[index] = value;
-    setProperty({ ...property, images: updatedImages });
-  };
 
   const addImage = () => {
     setProperty({ ...property, images: [...(property.images || []), ""] });

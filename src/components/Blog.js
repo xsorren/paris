@@ -53,13 +53,6 @@ const Blog = () => {
     }
   };
 
-  const filtrarPorOperacion = (tipoOperacion) => {
-    setFiltroActivo(tipoOperacion);
-    const filtradas = propiedades.filter(
-      (prop) => prop.operacion?.toLowerCase() === tipoOperacion.toLowerCase()
-    );
-    setFiltered(filtradas);
-  };
 
   const handleDeleteClick = (property) => {
     setPropertyToDelete(property);
