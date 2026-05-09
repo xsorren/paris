@@ -4,12 +4,13 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-"functions": {
-  "source": "functions",
-  "predeploy": []
-},
+  "functions": {
+    "source": "functions",
+    "predeploy": []
+  },
   "hosting": {
-    "public": "(build)",
+    "site": "parisnegociosinmobiliarios",
+    "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
