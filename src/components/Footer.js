@@ -122,14 +122,46 @@ const Footer = () => {
         <Column>
           <title>Contacto</title>
           <InfoList>
-            <li><i className="fas fa-clock" /> Horarios: 08:00–12:30 / 16:00–20:00</li>
+            <li><i className="fas fa-clock" /> Horarios: 09:00–12:00 / 16:00–20:00</li>
             <li><i className="fas fa-phone" /> Teléfono: 2227-535057</li>
             <li><i className="fas fa-envelope" /> Email: parisnegociosinmobiliarios@gmail.com</li>
             <li><i className="fas fa-map-marker-alt" /> Oficina: Calle 28 Nº917, Navarro, Buenos Aires</li>
           </InfoList>
         </Column>
       </Container>
-      <Copyright>Facundo Peralta. © 2026</Copyright>
+      <Copyright
+        sx={{
+          mt: 4,
+          py: 2,
+          textAlign: "center",
+          fontSize: "0.9rem",
+          color: "rgba(255,255,255,0.7)",
+          borderTop: "1px solid rgba(255,255,255,0.1)",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Paris Negocios Inmobiliarios © 2026 · Desarrollado por{" "}
+        <a
+          href="https://studio--studio-2931549742-72d7c.us-central1.hosted.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            textDecoration: "underline",
+            textUnderlineOffset: "3px",
+            fontWeight: 500,
+            transition: "opacity 0.3s ease",
+          }}
+          onMouseOver={(e) => {
+            e.target.style.opacity = "0.8";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.opacity = "1";
+          }}
+        >
+          FALTRA STUDIO
+        </a>
+      </Copyright>
     </FooterSection>
   );
 };

@@ -82,7 +82,7 @@ const Contact = () => {
                 type="text"
                 name="user_name"
                 style={styles.input}
-                placeholder="Ej: Juan Pérez"
+                placeholder="Nombre y Apellido"
                 required
               />
             </div>
@@ -92,7 +92,7 @@ const Contact = () => {
                 type="text"
                 name="user_phone"
                 style={styles.input}
-                placeholder="Ej: 2227-XXXXXX"
+                placeholder=""
               />
             </div>
           </div>

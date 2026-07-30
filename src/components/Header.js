@@ -10,23 +10,40 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+  }
 `;
 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 `;
 
 const Logo = styled.img`
-  height: 110px;
-  width: 280px;
-  object-fit: fill;
-  filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5));
+  height: 80px;
+  width: auto;
+  max-width: 500px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   transition: all 0.3s ease;
+  padding-left: 40px;
+  
+
+  &:hover {
+    transform: scale(1.03);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+  }
 
   @media (max-width: 768px) {
-    height: 60px;
+    height: 48px;
+    padding-left: 0;
+    max-width: calc(100% - 55px);
   }
 `;
 
@@ -35,22 +52,30 @@ const NavbarMenu = styled.ul`
   gap: 25px;
   list-style: none;
   align-items: center;
+  margin: 0;
+  padding: 0;
 
   @media (max-width: 768px) {
     position: fixed;
-    top: 70px;
+    top: 68px;
     right: ${({ open }) => (open ? "0" : "-100%")};
     background-color: #0b1f44;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 68px);
     width: 250px;
     flex-direction: column;
     padding: 30px 20px;
     transition: right 0.3s ease-in-out;
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+    align-items: center;
   }
 `;
 
-const NavbarItem = styled.li``;
+const NavbarItem = styled.li`
+  @media (max-width: 768px) {
+    width: 100%;
+    text-align: center;
+  }
+`;
 
 const NavbarLink = styled(Link)`
   text-decoration: none;
@@ -60,10 +85,19 @@ const NavbarLink = styled(Link)`
   padding: 6px 12px;
   border-radius: 6px;
   transition: background-color 0.3s ease;
+  display: inline-block;
 
   &:hover {
     background-color: #184a8e;
     color: #fff;
+  }
+
+  @media (max-width: 768px) {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 16px;
   }
 `;
 
@@ -93,6 +127,11 @@ const AdminContainer = styled.div`
   right: 15px;
   text-align: right;
   z-index: 9999;
+
+  @media (max-width: 768px) {
+    bottom: 10px;
+    right: 10px;
+  }
 `;
 
 const AdminBadge = styled.div`
@@ -137,7 +176,7 @@ const Header = () => {
     <>
       <HeaderWrapper>
         <Container>
-          <Logo src="/ParisLogoInmo.png" alt="Logo Paris Inmobiliaria" />
+          <Logo src="/logoINMOsinFondo_cropped.png" alt="Logo Paris Inmobiliaria" />
 
           <Hamburger onClick={toggleMenu} aria-label="Toggle menu">
             <span style={{ transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
