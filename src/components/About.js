@@ -37,7 +37,7 @@ const About = () => {
                         }}
                     >
                         <img
-                            src="/logoINMO.JPG"
+                            src="/FONDOPARIS.jpeg"
                             alt="Paris Negocios Inmobiliarios"
                             style={{
                                 width: "150%",

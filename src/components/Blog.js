@@ -46,9 +46,12 @@ const Blog = () => {
     if (tipo === "todas") {
       setFiltered(propiedades);
     } else {
-      const filtradas = propiedades.filter(
-        (prop) => prop.categoria?.toLowerCase() === tipo.toLowerCase()
-      );
+      const filtradas = propiedades.filter((prop) => {
+        if (!prop.categoria) return false;
+        const c = prop.categoria.toLowerCase().trim();
+        const t = tipo.toLowerCase().trim();
+        return c === t || c + "s" === t || t + "s" === c || c + "es" === t || t + "es" === c;
+      });
       setFiltered(filtradas);
     }
   };
@@ -347,7 +350,7 @@ const Blog = () => {
       <div style={styles.separator}></div>
 
       <div style={styles.filterButtons}>
-        {["todas", "casa", "departamento", "lote", "local"].map((tipo) => (
+        {["todas", "casas", "departamentos", "lotes", "locales", "campos"].map((tipo) => (
           <button
             key={tipo}
             style={{
@@ -357,7 +360,7 @@ const Blog = () => {
             }}
             onClick={() => filtrarPorTipo(tipo)}
           >
-            {tipo === "local" ? "Locales" : tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+            {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
           </button>
         ))}
       </div>

@@ -10,9 +10,19 @@ import { auth } from './firebaseConfig';
 
 const googleProvider = new GoogleAuthProvider();
 
-// Email específico autorizado
-const AUTHORIZED_EMAIL = 'parispropiedadesinfo@gmail.com';
-// PARIS2026
+// Lista de emails autorizados
+export const AUTHORIZED_EMAILS = [
+  'parispropiedadesinfo@gmail.com',
+  'parisnegociosinmobiliarios@gmail.com'
+];
+
+export const isAuthorizedEmail = (email) => {
+  if (!email) return false;
+  return AUTHORIZED_EMAILS.some(
+    (authedEmail) => authedEmail.toLowerCase() === email.trim().toLowerCase()
+  );
+};
+
 // Función para iniciar sesión con Google
 export const signInWithGoogle = async () => {
   try {
@@ -20,19 +30,18 @@ export const signInWithGoogle = async () => {
     const user = result.user;
 
     // Verificar si el email está autorizado
-    if (user.email === AUTHORIZED_EMAIL) {
-      // Guardar información del usuario en localStorage
+    if (isAuthorizedEmail(user.email)) {
       localStorage.setItem('isAdmin', 'true');
       localStorage.setItem('userEmail', user.email);
       localStorage.setItem('userName', user.displayName || user.email);
 
       return { success: true, user };
     } else {
-      // Si no es el email autorizado, cerrar sesión
+      // Si no es un email autorizado, cerrar sesión
       await signOut(auth);
       return {
         success: false,
-        error: `Solo el email ${AUTHORIZED_EMAIL} está autorizado para acceder.`
+        error: 'Tu email no está autorizado para acceder al panel de administración.'
       };
     }
   } catch (error) {
@@ -44,14 +53,14 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Función para iniciar sesión con email y contraseña (método actual)
+// Función para iniciar sesión con email y contraseña
 export const signInWithEmail = async (email, password) => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const user = result.user;
 
     // Verificar si el email está autorizado
-    if (user.email === AUTHORIZED_EMAIL) {
+    if (isAuthorizedEmail(user.email)) {
       localStorage.setItem('isAdmin', 'true');
       localStorage.setItem('userEmail', user.email);
       localStorage.setItem('userName', user.displayName || user.email);
@@ -61,7 +70,7 @@ export const signInWithEmail = async (email, password) => {
       await signOut(auth);
       return {
         success: false,
-        error: `Solo el email ${AUTHORIZED_EMAIL} está autorizado para acceder.`
+        error: 'Tu email no está autorizado para acceder al panel de administración.'
       };
     }
   } catch (error) {
@@ -90,7 +99,7 @@ export const signOutUser = async () => {
 // Función para verificar el estado de autenticación
 export const checkAuthState = (callback) => {
   return onAuthStateChanged(auth, (user) => {
-    if (user && user.email === AUTHORIZED_EMAIL) {
+    if (user && isAuthorizedEmail(user.email)) {
       localStorage.setItem('isAdmin', 'true');
       localStorage.setItem('userEmail', user.email);
       localStorage.setItem('userName', user.displayName || user.email);
@@ -107,6 +116,5 @@ export const checkAuthState = (callback) => {
 export const isUserAuthorized = () => {
   const isAdmin = localStorage.getItem('isAdmin');
   const userEmail = localStorage.getItem('userEmail');
-  return isAdmin === 'true' && userEmail === AUTHORIZED_EMAIL;
+  return isAdmin === 'true' && isAuthorizedEmail(userEmail);
 };
-

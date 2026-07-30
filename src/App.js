@@ -1,4 +1,3 @@
-// App.js sin <Router>
 import "./App.css";
 import FlatDetail from "./components/FlatDetail";
 import Header from "./components/Header";
@@ -20,7 +19,7 @@ import EditPropiedad from "./components/EditPropiedad";
 
 function App() {
   useEffect(() => {
-    Modal.setAppElement('#root');
+    Modal.setAppElement("#root");
   }, []);
 
   return (
@@ -33,7 +32,14 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
-        <Route path="/editar-propiedad/:id" element={<EditPropiedad />} /> {/* ✅ nueva ruta */}
+        <Route
+          path="/editar-propiedad/:id"
+          element={
+            <RequireAdmin>
+              <EditPropiedad />
+            </RequireAdmin>
+          }
+        />
         <Route path="/flat/:slug" element={<FlatDetail />} />
         <Route path="/login" element={<Login />} />
         <Route
