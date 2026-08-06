@@ -1,0 +1,260 @@
+/* src/components/Maintenance/ContactModal.module.css */
+
+/* Overlay del modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: 24px;
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Tarjeta principal */
+.card {
+  position: relative;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 25px 60px -12px rgba(0, 0, 0, 0.8),
+    0 0 50px rgba(59, 130, 246, 0.1);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 36px 28px 28px;
+  color: #f8fafc;
+  animation: scaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollbar personalizado */
+.card::-webkit-scrollbar {
+  width: 6px;
+}
+.card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.card::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* Botón cerrar */
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  transform: rotate(90deg);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.iconBadge {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+  color: #60a5fa;
+}
+
+.title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px 0;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Lista de canales */
+.channelList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Item de canal */
+.channelItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0s) both;
+}
+
+.channelItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--channel-color, rgba(255, 255, 255, 0.12));
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 0 0 1px var(--channel-color, transparent);
+}
+
+/* El item de horarios no es clickeable */
+.channelItem:not(a) {
+  cursor: default;
+}
+.channelItem:not(a):hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ícono del canal */
+.channelIcon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--channel-color, #60a5fa);
+  transition: all 0.25s ease;
+}
+
+.channelItem:hover .channelIcon {
+  background: color-mix(in srgb, var(--channel-color, #3b82f6) 12%, transparent);
+  border-color: color-mix(in srgb, var(--channel-color, #3b82f6) 25%, transparent);
+}
+
+/* Info del canal */
+.channelInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.channelLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+}
+
+.channelValue {
+  font-size: 0.8rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Flecha */
+.channelArrow {
+  color: #475569;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.channelItem:hover .channelArrow {
+  color: var(--channel-color, #60a5fa);
+  transform: translateX(2px);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 18px 22px;
+    border-radius: 20px;
+    max-height: 90vh;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .channelItem {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .channelIcon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 10px;
+  }
+
+  .channelValue {
+    font-size: 0.75rem;
+  }
+}

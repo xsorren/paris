@@ -9,18 +9,38 @@ import Blog from "./components/Blog";
 import BlogDetail from "./components/BlogDetail";
 import CreateProperty from "./components/CreateProperty";
 import Login from "./components/Login";
-import { Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import AdminUpload from "../src/firebase/AdminUpload";
 
 import RequireAdmin from "./components/RequireAdmin";
 import EditPropiedad from "./components/EditPropiedad";
+import Maintenance from "./components/Maintenance/Maintenance";
+import { maintenance } from "./config/maintenanceConfig";
 
 function App() {
+  const navigate = useNavigate();
+  const [isAdminSession, setIsAdminSession] = useState(() => {
+    return (
+      localStorage.getItem("isAdmin") === "true" ||
+      sessionStorage.getItem("isAdmin") === "true"
+    );
+  });
+
   useEffect(() => {
     Modal.setAppElement("#root");
   }, []);
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminSession(true);
+    navigate("/admin", { replace: true });
+  };
+
+  // Cuando maintenance es true y no hay sesión de administrador activa, se renderiza la pantalla de mantenimiento
+  if (maintenance && !isAdminSession) {
+    return <Maintenance onAdminLoginSuccess={handleAdminLoginSuccess} />;
+  }
 
   return (
     <div className="App">

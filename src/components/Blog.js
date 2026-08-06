@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { deleteProperty, updatePropertyStatus } from "../firebase/propertyService";
 import { isUserAuthorized } from "../firebase/authService";
@@ -18,19 +18,89 @@ const Blog = () => {
   const [propertyToDelete, setPropertyToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Admin Ordering State
+  const [, setOrderConfig] = useState(null);
+  const [showOrderMenu, setShowOrderMenu] = useState(false);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedPropertyIds, setSelectedPropertyIds] = useState([]);
+  const [savingOrder, setSavingOrder] = useState(false);
+
+  // Helper para aplicar el orden configurado (por ID ascendente o personalizado)
+  const applyPropertyOrder = (list, config) => {
+    if (!list || list.length === 0) return [];
+    if (!config) {
+      return [...list].sort((a, b) => {
+        const idA = a.idPropiedad != null ? Number(a.idPropiedad) : -Infinity;
+        const idB = b.idPropiedad != null ? Number(b.idPropiedad) : -Infinity;
+        return idB - idA;
+      });
+    }
+
+    if (config.type === "id_desc" || config.type === "id_asc") {
+      return [...list].sort((a, b) => {
+        const idA = a.idPropiedad != null ? Number(a.idPropiedad) : -Infinity;
+        const idB = b.idPropiedad != null ? Number(b.idPropiedad) : -Infinity;
+        return idB - idA;
+      });
+    }
+
+    if (config.type === "custom" && Array.isArray(config.orderedIds)) {
+      const orderMap = new Map();
+      config.orderedIds.forEach((id, index) => {
+        orderMap.set(String(id), index);
+      });
+
+      return [...list].sort((a, b) => {
+        const posA = orderMap.has(String(a.id)) ? orderMap.get(String(a.id)) : Infinity;
+        const posB = orderMap.has(String(b.id)) ? orderMap.get(String(b.id)) : Infinity;
+
+        if (posA !== posB) {
+          return posA - posB;
+        }
+        const idA = a.idPropiedad != null ? Number(a.idPropiedad) : -Infinity;
+        const idB = b.idPropiedad != null ? Number(b.idPropiedad) : -Infinity;
+        return idB - idA;
+      });
+    }
+
+    return list;
+  };
+
+  const applyCategoryFilter = (list, tipo) => {
+    if (tipo === "todas") return list;
+    return list.filter((prop) => {
+      if (!prop.categoria) return false;
+      const c = prop.categoria.toLowerCase().trim();
+      const t = tipo.toLowerCase().trim();
+      return c === t || c + "s" === t || t + "s" === c || c + "es" === t || t + "es" === c;
+    });
+  };
+
   useEffect(() => {
-    // Verificar si el usuario es administrador
     setIsAdmin(isUserAuthorized());
 
-    const fetchProperties = async () => {
+    const fetchPropertiesAndOrder = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "propiedades"));
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const rawData = querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
         }));
-        setPropiedades(data);
-        setFiltered(data);
+
+        let currentConfig = null;
+        try {
+          const configSnap = await getDoc(doc(db, "configuracion", "ordenPropiedades"));
+          if (configSnap.exists()) {
+            currentConfig = configSnap.data();
+            setOrderConfig(currentConfig);
+          }
+        } catch (cfgErr) {
+          console.warn("No se pudo obtener la configuración de orden:", cfgErr);
+        }
+
+        const sortedData = applyPropertyOrder(rawData, currentConfig);
+        setPropiedades(sortedData);
+        setFiltered(applyCategoryFilter(sortedData, filtroActivo));
       } catch (err) {
         console.error("Error al obtener propiedades:", err);
       } finally {
@@ -38,22 +108,94 @@ const Blog = () => {
       }
     };
 
-    fetchProperties();
+    fetchPropertiesAndOrder();
   }, []);
 
   const filtrarPorTipo = (tipo) => {
     setFiltroActivo(tipo);
-    if (tipo === "todas") {
-      setFiltered(propiedades);
-    } else {
-      const filtradas = propiedades.filter((prop) => {
-        if (!prop.categoria) return false;
-        const c = prop.categoria.toLowerCase().trim();
-        const t = tipo.toLowerCase().trim();
-        return c === t || c + "s" === t || t + "s" === c || c + "es" === t || t + "es" === c;
-      });
-      setFiltered(filtradas);
+    setFiltered(applyCategoryFilter(propiedades, tipo));
+  };
+
+  // Handlers de ordenamiento Admin
+  const handleSortByIdDesc = async () => {
+    const newConfig = {
+      type: "id_desc",
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      setLoading(true);
+      await setDoc(doc(db, "configuracion", "ordenPropiedades"), newConfig);
+      setOrderConfig(newConfig);
+
+      const sortedData = applyPropertyOrder(propiedades, newConfig);
+      setPropiedades(sortedData);
+      setFiltered(applyCategoryFilter(sortedData, filtroActivo));
+      setShowOrderMenu(false);
+    } catch (err) {
+      console.error("Error al guardar orden por ID:", err);
+      alert("Hubo un error al guardar el orden por ID.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleStartSelectionMode = () => {
+    setIsSelectionMode(true);
+    setSelectedPropertyIds([]);
+    setShowOrderMenu(false);
+  };
+
+  const handleToggleSelectProperty = (propertyId) => {
+    setSelectedPropertyIds((prev) => {
+      if (prev.includes(propertyId)) {
+        return prev.filter((id) => id !== propertyId);
+      } else {
+        return [...prev, propertyId];
+      }
+    });
+  };
+
+  const handleSaveCustomOrder = async () => {
+    if (selectedPropertyIds.length === 0) {
+      alert("Por favor selecciona al menos una propiedad para establecer el orden.");
+      return;
+    }
+
+    setSavingOrder(true);
+    try {
+      const unselectedIds = propiedades
+        .filter((p) => !selectedPropertyIds.includes(p.id))
+        .map((p) => p.id);
+
+      const fullOrderedIds = [...selectedPropertyIds, ...unselectedIds];
+
+      const newConfig = {
+        type: "custom",
+        orderedIds: fullOrderedIds,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await setDoc(doc(db, "configuracion", "ordenPropiedades"), newConfig);
+      setOrderConfig(newConfig);
+
+      const reorderedData = applyPropertyOrder(propiedades, newConfig);
+      setPropiedades(reorderedData);
+      setFiltered(applyCategoryFilter(reorderedData, filtroActivo));
+
+      setIsSelectionMode(false);
+      setSelectedPropertyIds([]);
+    } catch (err) {
+      console.error("Error al guardar orden personalizado:", err);
+      alert("Hubo un error al guardar el orden. Intenta nuevamente.");
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
+  const handleCancelSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedPropertyIds([]);
   };
 
 
@@ -342,6 +484,207 @@ const Blog = () => {
             opacity: 0.85;
             box-shadow: 0 4px 8px rgba(11, 31, 68, 0.2);
           }
+
+          /* --- Admin Order Control Styles --- */
+          .admin-order-container {
+            position: fixed;
+            bottom: 70px;
+            right: 15px;
+            z-index: 9999;
+            text-align: right;
+            font-family: Arial, sans-serif;
+          }
+          @media (max-width: 768px) {
+            .admin-order-container {
+              bottom: 60px;
+              right: 10px;
+            }
+          }
+
+          .admin-order-menu {
+            background-color: #0b1f44;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 10px;
+            width: 290px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+          }
+
+          .admin-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          }
+
+          .admin-order-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.7;
+          }
+          .admin-order-close:hover {
+            opacity: 1;
+          }
+
+          .admin-order-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            text-align: left;
+          }
+          .admin-order-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+          }
+
+          .admin-order-icon {
+            font-size: 22px;
+          }
+
+          .admin-order-title {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+          }
+          .admin-order-subtitle {
+            font-size: 11px;
+            color: #cbd5e1;
+            display: block;
+          }
+
+          .admin-order-trigger-btn {
+            background-color: #0b1f44;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            font-family: Arial, sans-serif;
+          }
+          .admin-order-trigger-btn:hover {
+            background-color: #184a8e;
+          }
+
+          .admin-selection-bar {
+            position: fixed;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0b1f44;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 2px solid #184a8e;
+            font-family: Arial, sans-serif;
+            max-width: 90%;
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .admin-selection-info {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .admin-selection-count {
+            background: #184a8e;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 13px;
+          }
+
+          .admin-save-order-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+          }
+          .admin-save-order-btn:hover {
+            background-color: #059669;
+            transform: scale(1.05);
+          }
+
+          .admin-cancel-order-btn {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .admin-cancel-order-btn:hover {
+            background-color: #475569;
+          }
+
+          .selection-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+            user-select: none;
+          }
+          .selection-indicator.selected {
+            background-color: #10b981;
+            color: #ffffff;
+            border: 2px solid white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6);
+            transform: scale(1.05);
+          }
+
+          .premium-card.selectable {
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+          }
+          .premium-card.selectable-selected {
+            box-shadow: 0 0 0 3px #10b981, 0 10px 25px rgba(0,0,0,0.2) !important;
+          }
         `}
       </style>
       <h1 style={styles.title}>
@@ -383,10 +726,24 @@ const Blog = () => {
               return null;
             };
             const badgeText = getBadgeText();
+            const isSelectedInMode = isSelectionMode && selectedPropertyIds.includes(property.id);
+            const selectedIndex = isSelectionMode ? selectedPropertyIds.indexOf(property.id) : -1;
 
             return (
-              <div key={property.id} className="premium-card">
-                <Link to={`/blog/${property.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <div
+                key={property.id}
+                className={`premium-card ${isSelectionMode ? 'selectable' : ''} ${isSelectedInMode ? 'selectable-selected' : ''}`}
+              >
+                <Link
+                  to={`/blog/${property.id}`}
+                  onClick={(e) => {
+                    if (isSelectionMode) {
+                      e.preventDefault();
+                      handleToggleSelectProperty(property.id);
+                    }
+                  }}
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', flex: 1 }}
+                >
                   <div className="premium-image-wrapper">
                     <img
                       src={
@@ -401,6 +758,12 @@ const Blog = () => {
                         e.target.src = "https://via.placeholder.com/400x300?text=Error+al+cargar";
                       }}
                     />
+
+                    {isSelectionMode && (
+                      <div className={`selection-indicator ${isSelectedInMode ? 'selected' : ''}`}>
+                        {isSelectedInMode ? `✓ Posición #${selectedIndex + 1}` : '+ Seleccionar'}
+                      </div>
+                    )}
 
                     {badgeText && (
                       <div className="premium-badge">
@@ -519,6 +882,90 @@ const Blog = () => {
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Botón Flotante y Menú de Ordenamiento Admin */}
+      {isAdmin && (
+        <div className="admin-order-container">
+          {showOrderMenu && (
+            <div className="admin-order-menu">
+              <div className="admin-order-header">
+                <span>⚙️ Opciones de Ordenamiento</span>
+                <button
+                  type="button"
+                  className="admin-order-close"
+                  onClick={() => setShowOrderMenu(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <button
+                type="button"
+                className="admin-order-item"
+                onClick={handleSortByIdDesc}
+              >
+                <span className="admin-order-icon">🔢</span>
+                <div>
+                  <span className="admin-order-title">1. Ordenar por ID</span>
+                  <span className="admin-order-subtitle">Ordenar de mayor a menor ID (19, 18, 17...)</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="admin-order-item"
+                onClick={handleStartSelectionMode}
+              >
+                <span className="admin-order-icon">🎯</span>
+                <div>
+                  <span className="admin-order-title">2. Seleccionar para ordenar</span>
+                  <span className="admin-order-subtitle">Destacar propiedades manualmente</span>
+                </div>
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="admin-order-trigger-btn"
+            onClick={() => setShowOrderMenu(!showOrderMenu)}
+          >
+            {isSelectionMode ? "🎯 Modo Selección Activo" : "⚙️ Ordenar Propiedades"}
+          </button>
+        </div>
+      )}
+
+      {/* Barra del Modo Selección (El botón Guardar solo aparece cuando el modo de selección está activo) */}
+      {isSelectionMode && (
+        <div className="admin-selection-bar">
+          <div className="admin-selection-info">
+            <span>🎯 Modo Selección:</span>
+            <span>Haz click en las propiedades en el orden que deseas destacarlas.</span>
+            <span className="admin-selection-count">
+              {selectedPropertyIds.length} seleccionada{selectedPropertyIds.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <button
+              type="button"
+              className="admin-save-order-btn"
+              onClick={handleSaveCustomOrder}
+              disabled={savingOrder}
+            >
+              {savingOrder ? "Guardando..." : "💾 Guardar"}
+            </button>
+            <button
+              type="button"
+              className="admin-cancel-order-btn"
+              onClick={handleCancelSelectionMode}
+              disabled={savingOrder}
+            >
+              ✕ Cancelar
+            </button>
           </div>
         </div>
       )}

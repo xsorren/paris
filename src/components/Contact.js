@@ -68,8 +68,8 @@ const Contact = () => {
           </div>
           <div style={styles.contactItem}>
             <i className="fas fa-phone-alt" style={styles.icon}></i>
-            <h4>Teléfono</h4>
-            <p>2227-535057</p>
+            <h4>Teléfonos</h4>
+            <p>2227-535057 / 2227-513616</p>
           </div>
         </div>
 

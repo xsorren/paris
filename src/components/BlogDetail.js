@@ -5,6 +5,7 @@ import { db } from "../firebase/firebaseConfig";
 import usePageTitle from "../hooks/usePageTitle";
 import { updatePropertyStatus } from "../firebase/propertyService";
 import { isUserAuthorized } from "../firebase/authService";
+import { formatearIdPropiedad } from "../utils/propertyUtils";
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -277,6 +278,73 @@ const BlogDetail = () => {
             border-radius: 8px !important;
             border: none !important;
           }
+
+          /* --- Tooltip estilo Uiverse para ID de Propiedad --- */
+          .property-id-badge-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+          }
+
+          .property-id-badge {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #184a8e;
+            background-color: rgba(24, 74, 142, 0.08);
+            border: 1px solid rgba(24, 74, 142, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+          }
+
+          .property-id-badge:hover {
+            background-color: rgba(24, 74, 142, 0.15);
+            border-color: rgba(24, 74, 142, 0.4);
+            transform: translateY(-1px);
+          }
+
+          .property-id-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            right: 0;
+            transform: translateY(6px) scale(0.95);
+            transform-origin: bottom right;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.25s;
+            pointer-events: none;
+            font-family: Arial, sans-serif;
+            letter-spacing: 0.3px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+          }
+
+          .property-id-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 18px;
+            border-width: 6px 6px 0 6px;
+            border-style: solid;
+            border-color: #0f172a transparent transparent transparent;
+          }
+
+          .property-id-badge-container:hover .property-id-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+          }
         `}
       </style>
       <h1 style={styles.title} className="bd-title">{property.title}</h1>
@@ -373,7 +441,19 @@ const BlogDetail = () => {
         <div style={styles.rightPanel} className="right-panel">
           {/* Información de la propiedad */}
           <div style={styles.details}>
-            <h3 style={styles.sectionTitle}>📋 Información de la Propiedad</h3>
+            <h3 style={styles.sectionTitle}>
+              <span>📋 Información de la Propiedad</span>
+              {property.idPropiedad != null && (
+                <div className="property-id-badge-container">
+                  <span className="property-id-badge">
+                    {formatearIdPropiedad(property.idPropiedad)}
+                  </span>
+                  <span className="property-id-tooltip">
+                    ID de la propiedad
+                  </span>
+                </div>
+              )}
+            </h3>
             <p><strong>📍 Ubicación:</strong> {property.localidad}</p>
             <p><strong>📐 Metros:</strong> {property.metros}</p>
             <p><strong>🏠 Tipo:</strong> {property.categoria}</p>
@@ -694,6 +774,11 @@ const styles = {
     marginBottom: "20px",
     paddingBottom: "10px",
     borderBottom: "2px solid #184a8e",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
   },
   mapSection: {
     backgroundColor: "#ffffff",

@@ -13,7 +13,8 @@ const googleProvider = new GoogleAuthProvider();
 // Lista de emails autorizados
 export const AUTHORIZED_EMAILS = [
   'parispropiedadesinfo@gmail.com',
-  'parisnegociosinmobiliarios@gmail.com'
+  'parisnegociosinmobiliarios@gmail.com',
+  'faltrastudio@gmail.com'
 ];
 
 export const isAuthorizedEmail = (email) => {
