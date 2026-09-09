@@ -376,6 +376,8 @@ const EditPropiedad = () => {
                   <option value="lote">Lote</option>
                   <option value="local">Local</option>
                   <option value="campo">Campo</option>
+                  <option value="quinta">Quinta</option>
+                  <option value="complejo turistico">Complejo Turístico</option>
                 </select>
               </div>
 
@@ -429,7 +431,7 @@ const EditPropiedad = () => {
                   <option value="disponible">Disponible</option>
                   <option value="vendida">Vendida</option>
                   <option value="alquilada">Alquilada</option>
-                  <option value="financiacion">Financiación</option>
+                  {/* <option value="financiacion">Financiación</option>*/}
                 </select>
               </div>
             </div>

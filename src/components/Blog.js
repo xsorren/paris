@@ -363,6 +363,33 @@ const Blog = () => {
             z-index: 2;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
           }
+          .premium-badge--vendida {
+            background-color: #ec7016;
+          }
+          .premium-badge--vendida:hover {
+            background-color: #d4610f;
+          }
+          .premium-badge--vendida:active {
+            background-color: #bc5509;
+          }
+          .premium-badge--vendido {
+            background-color: #c0392b;
+          }
+          .premium-badge--vendido:hover {
+            background-color: #a93226;
+          }
+          .premium-badge--vendido:active {
+            background-color: #922b21;
+          }
+          .premium-badge--alquilada {
+            background-color: #1a7a4a;
+          }
+          .premium-badge--alquilada:hover {
+            background-color: #15653d;
+          }
+          .premium-badge--alquilada:active {
+            background-color: #104f30;
+          }
           .agent-badge {
             position: absolute;
             bottom: 15px;
@@ -693,7 +720,7 @@ const Blog = () => {
       <div style={styles.separator}></div>
 
       <div style={styles.filterButtons}>
-        {["todas", "casas", "departamentos", "lotes", "locales", "campos"].map((tipo) => (
+        {["todas", "casas", "departamentos", "lotes", "locales", "campos", "quintas", "complejos turisticos"].map((tipo) => (
           <button
             key={tipo}
             style={{
@@ -719,9 +746,10 @@ const Blog = () => {
           {filtered.map((property) => {
             const getBadgeText = () => {
               if (property.destacada) return "DESTACADO";
+              if (property.estado === "vendido") return "VENDIDO";
               if (property.estado === "vendida") return "VENDIDA";
               if (property.estado === "alquilada") return "ALQUILADA";
-              if (property.estado === "financiacion") return "FINANCIACIÓN";
+              // if (property.estado === "financiacion") return "FINANCIACIÓN";
               if (property.estado === "nueva") return "NUEVA";
               return null;
             };
@@ -766,7 +794,7 @@ const Blog = () => {
                     )}
 
                     {badgeText && (
-                      <div className="premium-badge">
+                      <div className={`premium-badge${badgeText === "VENDIDA" ? " premium-badge--vendida" : ""}${badgeText === "VENDIDO" ? " premium-badge--vendido" : ""}${badgeText === "ALQUILADA" ? " premium-badge--alquilada" : ""}`}>
                         {badgeText}
                       </div>
                     )}
@@ -812,23 +840,26 @@ const Blog = () => {
                 )}
                 {isAdmin && (
                   <div style={{ padding: "0 10px 10px", marginTop: "15px", display: "flex", gap: "5px", flexWrap: "wrap", zIndex: 3, position: 'relative' }}>
+                    {/* Botón Vendido */}
                     <button
                       className="admin-btn"
-                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'vendida' ? 'disponible' : 'vendida'); }}
+                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'vendido' ? null : 'vendido'); }}
+                    >
+                      {property.estado === 'vendido' ? 'Disponible' : 'Vendido'}
+                    </button>
+                    {/* Botón Vendida */}
+                    <button
+                      className="admin-btn"
+                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'vendida' ? null : 'vendida'); }}
                     >
                       {property.estado === 'vendida' ? 'Disponible' : 'Vendida'}
                     </button>
+                    {/* Botón Alquilada */}
                     <button
                       className="admin-btn"
-                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'alquilada' ? 'disponible' : 'alquilada'); }}
+                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'alquilada' ? null : 'alquilada'); }}
                     >
                       {property.estado === 'alquilada' ? 'Disponible' : 'Alquilada'}
-                    </button>
-                    <button
-                      className="admin-btn"
-                      onClick={(e) => { e.preventDefault(); handleStatusChange(property.id, property.estado === 'financiacion' ? 'disponible' : 'financiacion'); }}
-                    >
-                      {property.estado === 'financiacion' ? 'Disponible' : 'Financ.'}
                     </button>
                   </div>
                 )}

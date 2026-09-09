@@ -16,6 +16,7 @@ const BlogDetail = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
 
 
   useEffect(() => {
@@ -247,10 +248,6 @@ const BlogDetail = () => {
             .bd-title {
               font-size: 18px !important;
             }
-            .bd-thumbnail {
-              width: 72px !important;
-              height: 52px !important;
-            }
             .bd-status-indicator {
               font-size: 16px !important;
             }
@@ -270,6 +267,30 @@ const BlogDetail = () => {
 
           .imageOverlayContainer:hover .hover-overlay {
            opacity: 1 !important;
+          }
+
+          /* Thumbnail grid hover */
+          .bd-thumbnail:hover {
+            opacity: 1 !important;
+            transform: scale(1.04);
+            border-color: #184a8e !important;
+          }
+          .bd-show-all-btn:hover {
+            background-color: #184a8e !important;
+            color: #fff !important;
+          }
+
+          /* Thumbnail grid responsive */
+          @media (max-width: 768px) {
+            .bd-thumbnail-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .bd-thumbnail-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 5px !important;
+            }
           }
           
           .map-embed iframe {
@@ -345,6 +366,51 @@ const BlogDetail = () => {
             visibility: visible;
             transform: translateY(0) scale(1);
           }
+
+          /* ---- Nav arrows ---- */
+          @keyframes imgFadeIn {
+            from { opacity: 0.55; }
+            to   { opacity: 1; }
+          }
+          .main-image {
+            animation: imgFadeIn 0.3s ease;
+          }
+          .bd-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.38);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.72;
+            transition: opacity 0.22s ease, background 0.22s ease, transform 0.22s ease;
+            padding: 0;
+            backdrop-filter: blur(2px);
+          }
+          .bd-nav-arrow:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.60);
+            transform: translateY(-50%) scale(1.08);
+          }
+          .bd-nav-arrow.bd-nav-prev { left: 12px; }
+          .bd-nav-arrow.bd-nav-next { right: 12px; }
+          @media (max-width: 480px) {
+            .bd-nav-arrow {
+              width: 34px;
+              height: 34px;
+              opacity: 0.85;
+            }
+            .bd-nav-arrow.bd-nav-prev { left: 6px; }
+            .bd-nav-arrow.bd-nav-next { right: 6px; }
+          }
         `}
       </style>
       <h1 style={styles.title} className="bd-title">{property.title}</h1>
@@ -367,6 +433,7 @@ const BlogDetail = () => {
             >
               <div style={styles.imageOverlayContainer} onClick={handleImageClick}>
                 <img
+                  key={activeImage}
                   src={
                     property.images?.[activeImage]?.url ||
                     property.images?.[activeImage] ||
@@ -393,15 +460,44 @@ const BlogDetail = () => {
                   </span>
                 </div>
               </div>
+
+              {/* Flechas de navegación */}
+              {property.images && property.images.length > 1 && (
+                <>
+                  {activeImage > 0 && (
+                    <button
+                      className="bd-nav-arrow bd-nav-prev"
+                      onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                      aria-label="Foto anterior"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                  )}
+                  {activeImage < property.images.length - 1 && (
+                    <button
+                      className="bd-nav-arrow bd-nav-next"
+                      onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                      aria-label="Foto siguiente"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
+                  )}
+                </>
+              )}
             </div>
 
 
             {/* Indicador de estado */}
             {property.estado && property.estado !== 'disponible' && (
               <div style={styles.statusIndicator} className="bd-status-indicator">
-                {property.estado === 'vendida' ? 'VENDIDA' :
-                  property.estado === 'financiacion' ? 'NUEVA FINANCIACIÓN' :
-                    'ALQUILADA'}
+                {property.estado === 'vendido' ? 'VENDIDO' :
+                  property.estado === 'vendida' ? 'VENDIDA' :
+                    property.estado === 'financiacion' ? 'NUEVA FINANCIACIÓN' :
+                      property.estado === 'alquilada' ? 'ALQUILADA' : null}
               </div>
             )}
 
@@ -413,26 +509,48 @@ const BlogDetail = () => {
             )}
           </div>
 
-          {/* Miniaturas solo si hay imágenes */}
+          {/* Galería de miniaturas en cuadrícula */}
           {property.images && property.images.length > 0 && (
-            <div style={styles.thumbnailRow}>
-              {property.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img.url || img}
-                  alt={`Miniatura ${index + 1}`}
-                  style={{
-                    ...styles.thumbnail,
-                    border: index === activeImage ? "3px solid #184a8e" : "2px solid #ddd",
-                    opacity: index === activeImage ? 1 : 0.7,
-                  }}
-                  className="bd-thumbnail"
-                  onClick={() => setActiveImage(index)}
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/100x70?text=Error";
-                  }}
-                />
-              ))}
+            <div>
+              <div style={styles.thumbnailGrid} className="bd-thumbnail-grid">
+                {property.images
+                  .slice(0, showAllPhotos ? property.images.length : 8)
+                  .map((img, index) => (
+                    <img
+                      key={index}
+                      src={img.url || img}
+                      alt={`Miniatura ${index + 1}`}
+                      style={{
+                        ...styles.thumbnailGridItem,
+                        border: index === activeImage ? "3px solid #184a8e" : "2px solid transparent",
+                        opacity: index === activeImage ? 1 : 0.75,
+                      }}
+                      className="bd-thumbnail"
+                      onClick={() => setActiveImage(index)}
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/100x70?text=Error";
+                      }}
+                    />
+                  ))}
+              </div>
+              {property.images.length > 8 && !showAllPhotos && (
+                <button
+                  style={styles.showAllPhotosBtn}
+                  className="bd-show-all-btn"
+                  onClick={() => setShowAllPhotos(true)}
+                >
+                  📷 Ver todas las fotos ({property.images.length})
+                </button>
+              )}
+              {showAllPhotos && property.images.length > 8 && (
+                <button
+                  style={styles.showAllPhotosBtn}
+                  className="bd-show-all-btn"
+                  onClick={() => setShowAllPhotos(false)}
+                >
+                  Mostrar menos
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -495,7 +613,7 @@ const BlogDetail = () => {
           {/* Panel de contacto */}
           <div style={styles.contactSection}>
             <h3 style={styles.contacttitle}>📞 Vías de contacto</h3>
-            <p><strong>📱 Teléfono:</strong> 2227-535057</p>
+            <p><strong>📱 Teléfono:</strong> 2227-535057 / 2227-513616</p>
             <p><strong>📧 Email:</strong> parisnegociosinmobiliarios@gmail.com</p>
             <p><strong>🏢 Oficina:</strong> Calle 28 Nº917, Navarro, Buenos Aires</p>
             <a
@@ -525,39 +643,53 @@ const BlogDetail = () => {
             <div style={styles.statusButtonsContainer}>
               <h4 style={styles.statusTitle}>Cambiar Estado:</h4>
               <div style={styles.statusButtons}>
+                {/* Botón Vendido */}
                 <button
                   style={{
                     ...styles.statusButton,
                     backgroundColor: '#0b1f44',
                     color: '#fff'
                   }}
-                  onClick={() => handleStatusChange(property.estado === 'vendida' ? 'disponible' : 'vendida')}
+                  onClick={() => handleStatusChange(property.estado === 'vendido' ? null : 'vendido')}
+                  title={property.estado === 'vendido' ? 'Marcar como disponible' : 'Marcar como vendido'}
+                >
+                  {property.estado === 'vendido' ? 'Marcar como Disponible' : 'Marcar como Vendido'}
+                </button>
+                {/* Botón Vendida */}
+                <button
+                  style={{
+                    ...styles.statusButton,
+                    backgroundColor: '#0b1f44',
+                    color: '#fff'
+                  }}
+                  onClick={() => handleStatusChange(property.estado === 'vendida' ? null : 'vendida')}
                   title={property.estado === 'vendida' ? 'Marcar como disponible' : 'Marcar como vendida'}
                 >
                   {property.estado === 'vendida' ? 'Marcar como Disponible' : 'Marcar como Vendida'}
                 </button>
+                {/* Botón Alquilada */}
                 <button
                   style={{
                     ...styles.statusButton,
                     backgroundColor: '#0b1f44',
                     color: '#fff'
                   }}
-                  onClick={() => handleStatusChange(property.estado === 'alquilada' ? 'disponible' : 'alquilada')}
+                  onClick={() => handleStatusChange(property.estado === 'alquilada' ? null : 'alquilada')}
                   title={property.estado === 'alquilada' ? 'Marcar como disponible' : 'Marcar como alquilada'}
                 >
                   {property.estado === 'alquilada' ? 'Marcar como Disponible' : 'Marcar como Alquilada'}
                 </button>
-                <button
+                {/*<button
                   style={{
                     ...styles.statusButton,
                     backgroundColor: '#0b1f44',
                     color: '#fff'
                   }}
-                  onClick={() => handleStatusChange(property.estado === 'financiacion' ? 'disponible' : 'financiacion')}
+                  onClick={() => handleStatusChange(property.estado === 'financiacion' ? null : 'financiacion')}
                   title={property.estado === 'financiacion' ? 'Marcar como disponible' : 'Marcar como Nueva Financiación'}
                 >
                   {property.estado === 'financiacion' ? 'Marcar como Disponible' : 'Nueva Financiación'}
-                </button>
+                </button>*/}
               </div>
             </div>
           )}
@@ -691,18 +823,33 @@ const styles = {
     cursor: "pointer",
     transition: "transform 0.3s ease",
   },
-  thumbnailRow: {
-    display: "flex",
-    gap: "10px",
-    overflowX: "auto",
+  thumbnailGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "7px",
+    marginTop: "10px",
   },
-  thumbnail: {
-    width: "100px",
-    height: "70px",
+  thumbnailGridItem: {
+    width: "100%",
+    aspectRatio: "4 / 3",
     objectFit: "cover",
     borderRadius: "6px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "all 0.25s ease",
+  },
+  showAllPhotosBtn: {
+    display: "block",
+    margin: "12px auto 0",
+    padding: "8px 20px",
+    backgroundColor: "transparent",
+    color: "#184a8e",
+    border: "1.5px solid #184a8e",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    letterSpacing: "0.3px",
   },
   imageCounter: {
     position: "absolute",

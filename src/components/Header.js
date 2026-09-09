@@ -6,7 +6,7 @@ import styled from "styled-components";
 const HeaderWrapper = styled.header`
   background-color: #0b1f44;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  padding: 10px 24px;
+  padding: 10px 24px 10px 16px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -32,7 +32,7 @@ const Logo = styled.img`
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   transition: all 0.3s ease;
-  padding-left: 40px;
+  padding-left: 0;
   
 
   &:hover {

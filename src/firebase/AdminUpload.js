@@ -322,6 +322,8 @@ const AdminUpload = () => {
                   <option value="lote">Lote</option>
                   <option value="local">Local</option>
                   <option value="campo">Campo</option>
+                  <option value="quinta">Quinta</option>
+                  <option value="complejo turistico">Complejo Turístico</option>
                 </select>
               </div>
 
