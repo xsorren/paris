@@ -464,7 +464,7 @@ const Footer = () => {
         <CopyrightText>
           París Negocios Inmobiliarios © 2026 · Desarrollado por{" "}
           <a
-            href="https://studio--studio-2931549742-72d7c.us-central1.hosted.app"
+            href="https://faltrastudio.com/"
             target="_blank"
             rel="noopener noreferrer"
           >

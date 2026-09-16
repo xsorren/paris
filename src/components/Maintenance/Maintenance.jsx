@@ -38,9 +38,9 @@ const Maintenance = ({ onAdminLoginSuccess }) => {
       {/* Header con Logo */}
       <header className={styles.header}>
         <div className={styles.logoWrapper}>
-          <img 
-            src="/logoINMOsinFondo_cropped.png" 
-            alt="Paris Negocios Inmobiliarios" 
+          <img
+            src="/logoINMOsinFondo_cropped.png"
+            alt="Paris Negocios Inmobiliarios"
             className={styles.logo}
           />
         </div>
@@ -49,7 +49,7 @@ const Maintenance = ({ onAdminLoginSuccess }) => {
       {/* Tarjeta de Contenido Principal Centrada */}
       <main className={styles.mainContainer}>
         <div className={styles.statusBadge}>
-          <span 
+          <span
             className={styles.statusDot}
             onMouseDown={handleDotMouseDown}
             onMouseUp={handleDotMouseUp}
@@ -81,13 +81,13 @@ const Maintenance = ({ onAdminLoginSuccess }) => {
         {/* Contacto Sutil */}
         <div className={styles.contactSection}>
           <span className={styles.contactLabel}>¿Necesitás comunicarte con nosotros?</span>
-          <button 
+          <button
             className={styles.contactLink}
             onClick={() => setIsContactOpen(true)}
             type="button"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             Contactanos
           </button>
@@ -98,9 +98,9 @@ const Maintenance = ({ onAdminLoginSuccess }) => {
       <footer className={styles.footer}>
         <span>
           © {new Date().getFullYear()} Paris Negocios Inmobiliarios. Desarrollado por{' '}
-          <a 
-            href="https://studio--studio-2931549742-72d7c.us-central1.hosted.app" 
-            target="_blank" 
+          <a
+            href="https://faltrastudio.com/"
+            target="_blank"
             rel="noopener noreferrer"
             className={styles.developerLink}
           >
@@ -116,7 +116,7 @@ const Maintenance = ({ onAdminLoginSuccess }) => {
       />
 
       {/* Modal de Inicio de Sesión de Admin (Firebase Auth) */}
-      <AdminLoginModal 
+      <AdminLoginModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleLoginSuccess}

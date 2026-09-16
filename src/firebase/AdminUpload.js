@@ -2,6 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveProperty } from "./propertyService";
 import { uploadMultipleImages, testStorageConnection, validateImageFiles } from "./imageUploadService";
+import {
+  uploadMultipleVideos,
+  getVideoDuration,
+  validateVideoFile,
+  formatVideoDuration,
+  MAX_VIDEOS_PER_PROPERTY,
+} from "./videoUploadService";
 import usePageTitle from "../hooks/usePageTitle";
 import "./AdminUpload.css";
 
@@ -23,6 +30,11 @@ const AdminUpload = () => {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [dragActive, setDragActive] = useState(false);
 
+  // Video State — completely separate from images
+  // Each entry: { file: File, duration: number, objectUrl: string }
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [videoLoading, setVideoLoading] = useState(false);
+
   // Modals State
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [showImageMenu, setShowImageMenu] = useState(false);
@@ -34,6 +46,7 @@ const AdminUpload = () => {
   const [propertyId, setPropertyId] = useState("");
 
   const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -167,6 +180,72 @@ const AdminUpload = () => {
     setSelectedImageIndex((prev) => (prev - 1 + selectedFiles.length) % selectedFiles.length);
   };
 
+  // --- Video Handling ---
+  const handleVideoInputChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (videoInputRef.current) videoInputRef.current.value = "";
+    if (!files || files.length === 0) return;
+
+    // Check total count before processing
+    if (selectedVideos.length + files.length > MAX_VIDEOS_PER_PROPERTY) {
+      showNotification(
+        `Una propiedad puede tener un máximo de ${MAX_VIDEOS_PER_PROPERTY} videos. Ya tenés ${selectedVideos.length} seleccionado${selectedVideos.length !== 1 ? "s" : ""}.`,
+        false
+      );
+      return;
+    }
+
+    setVideoLoading(true);
+    const validatedVideos = [];
+    const errors = [];
+
+    for (const file of files) {
+      let duration = 0;
+      try {
+        duration = await getVideoDuration(file);
+      } catch (err) {
+        errors.push(`"${file.name}": No se pudo obtener la duración del video. Asegurate de que sea un archivo MP4 válido.`);
+        continue;
+      }
+
+      const validation = validateVideoFile(file, duration);
+      if (!validation.isValid) {
+        errors.push(validation.error);
+        continue;
+      }
+
+      validatedVideos.push({
+        file,
+        duration,
+        objectUrl: URL.createObjectURL(file),
+      });
+    }
+
+    setVideoLoading(false);
+
+    if (errors.length > 0) {
+      showNotification(errors.join("\n"), false);
+      // Still add valid videos if any passed
+    }
+
+    if (validatedVideos.length > 0) {
+      setSelectedVideos((prev) => [...prev, ...validatedVideos]);
+    }
+  };
+
+  const handleRemoveVideo = (indexToRemove, e) => {
+    if (e) e.stopPropagation();
+    setSelectedVideos((prev) => {
+      const updated = [...prev];
+      // Revoke the object URL to free memory
+      if (updated[indexToRemove]?.objectUrl) {
+        URL.revokeObjectURL(updated[indexToRemove].objectUrl);
+      }
+      updated.splice(indexToRemove, 1);
+      return updated;
+    });
+  };
+
   // --- Save / Upload Functionality ---
   const handleSaveProperty = async () => {
     const errores = [];
@@ -185,7 +264,9 @@ const AdminUpload = () => {
     setLoading(true);
     try {
       let uploadedImages = [];
+      let uploadedVideos = [];
 
+      // --- Upload images ---
       if (selectedFiles.length > 0) {
         // Reordenar para que la imagen principal sea la primera [0]
         const orderedFiles = [...selectedFiles];
@@ -210,6 +291,27 @@ const AdminUpload = () => {
         }
       }
 
+      // --- Upload videos (separate from images) ---
+      if (selectedVideos.length > 0) {
+        const videoFiles = selectedVideos.map((v) => v.file);
+        const videoUploadResult = await uploadMultipleVideos(
+          videoFiles,
+          propertyId,
+          categoria,
+          operacion
+        );
+
+        if (videoUploadResult.success) {
+          uploadedVideos = videoUploadResult.videos;
+        } else if (videoUploadResult.errors?.length > 0) {
+          // Partial failures: continue saving but warn
+          console.warn("Algunos videos fallaron al subir:", videoUploadResult.errors);
+          uploadedVideos = videoUploadResult.videos;
+        } else {
+          throw new Error(videoUploadResult.error || "Error al subir los videos");
+        }
+      }
+
       const propertyData = {
         titulo: titulo.trim(),
         categoria,
@@ -221,6 +323,7 @@ const AdminUpload = () => {
         observacion: observacion.trim(),
         estado: "disponible",
         images: uploadedImages,
+        videos: uploadedVideos,
         createdAt: new Date().toISOString(),
         propertyId,
       };
@@ -228,12 +331,16 @@ const AdminUpload = () => {
       const saveResult = await saveProperty(propertyData);
       if (!saveResult.success) throw new Error(saveResult.error);
 
+      const imagePart = uploadedImages.length
+        ? `${uploadedImages.length} imagen${uploadedImages.length > 1 ? "es" : ""}`
+        : "";
+      const videoPart = uploadedVideos.length
+        ? `${uploadedVideos.length} video${uploadedVideos.length > 1 ? "s" : ""}`
+        : "";
+      const mediaPart = [imagePart, videoPart].filter(Boolean).join(" y ");
+
       showNotification(
-        `Propiedad guardada con éxito${
-          uploadedImages.length
-            ? ` con ${uploadedImages.length} imagen${uploadedImages.length > 1 ? "es" : ""}`
-            : ""
-        }.`,
+        `Propiedad guardada con éxito${mediaPart ? ` con ${mediaPart}` : ""}.`,
         true
       );
 
@@ -250,6 +357,12 @@ const AdminUpload = () => {
       setMainImageIndex(0);
       setShowImageMenu(false);
       setShowFullscreenLightbox(false);
+
+      // Reset video state — revoke all object URLs
+      selectedVideos.forEach((v) => {
+        if (v.objectUrl) URL.revokeObjectURL(v.objectUrl);
+      });
+      setSelectedVideos([]);
 
       // Generate fresh Property ID for next entry
       setPropertyId(`prop_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`);
@@ -527,12 +640,98 @@ const AdminUpload = () => {
             )}
           </div>
 
+          {/* ===== Sección de Videos ===== */}
+          <div className="crm-video-section">
+            <div className="crm-video-section-header">
+              <div className="crm-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+              </div>
+              <h2 className="crm-card-title">Videos de la propiedad</h2>
+              <span className="crm-video-counter">
+                {selectedVideos.length}/{MAX_VIDEOS_PER_PROPERTY}
+              </span>
+            </div>
+
+            <p className="crm-video-hint">
+              Solo archivos <strong>.mp4</strong>, máx. 2 videos, duración inferior a 5 minutos cada uno.
+            </p>
+
+            {/* Input de selección de video */}
+            {selectedVideos.length < MAX_VIDEOS_PER_PROPERTY && (
+              <label className="crm-video-input-label">
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept=".mp4,video/mp4"
+                  multiple
+                  onChange={handleVideoInputChange}
+                  className="crm-video-input-hidden"
+                  disabled={videoLoading}
+                />
+                <span className="crm-video-input-btn">
+                  {videoLoading ? (
+                    <><span className="crm-spinner crm-spinner-sm"></span> Validando...
+                    </>
+                  ) : (
+                    <>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Seleccionar video MP4
+                    </>
+                  )}
+                </span>
+              </label>
+            )}
+
+            {/* Lista de videos seleccionados */}
+            {selectedVideos.length > 0 && (
+              <div className="crm-video-list">
+                {selectedVideos.map((video, idx) => (
+                  <div key={idx} className="crm-video-item">
+                    <video
+                      src={video.objectUrl}
+                      className="crm-video-preview"
+                      controls
+                      preload="metadata"
+                    />
+                    <div className="crm-video-meta">
+                      <span className="crm-video-name" title={video.file.name}>
+                        {video.file.name}
+                      </span>
+                      <span className="crm-video-duration">
+                        ⏱ {formatVideoDuration(video.duration)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="crm-video-remove-btn"
+                      title="Eliminar video"
+                      onClick={(e) => handleRemoveVideo(idx, e)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedVideos.length === 0 && (
+              <p className="crm-video-empty">No hay videos seleccionados.</p>
+            )}
+          </div>
+          {/* ============================= */}
+
           {/* Botón Principal Guardar Propiedad */}
           <button
             type="button"
             className="crm-save-btn"
             onClick={handleSaveProperty}
-            disabled={loading}
+            disabled={loading || videoLoading}
           >
             {loading ? (
               <>

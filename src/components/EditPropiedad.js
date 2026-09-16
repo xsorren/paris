@@ -3,14 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { uploadMultipleImages, validateImageFiles } from "../firebase/imageUploadService";
+import {
+  uploadMultipleVideos,
+  getVideoDuration,
+  validateVideoFile,
+  formatVideoDuration,
+  MAX_VIDEOS_PER_PROPERTY,
+} from "../firebase/videoUploadService";
 import usePageTitle from "../hooks/usePageTitle";
 import "../firebase/AdminUpload.css";
 
 const EditPropiedad = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-
   usePageTitle("Editar Propiedad - Panel de Administración");
 
   // Form State
@@ -29,6 +34,15 @@ const EditPropiedad = () => {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [dragActive, setDragActive] = useState(false);
 
+  // Video State — completely separate from images
+  // existingVideos: loaded from Firestore ({ url, fileName, path, ... })
+  // newVideos: selected by user but not yet saved ({ file, duration, objectUrl })
+  // deletedVideos: removed from existingVideos (tracked for reference)
+  const [existingVideos, setExistingVideos] = useState([]);
+  const [newVideos, setNewVideos] = useState([]);
+  const [, setDeletedVideos] = useState([]);
+  const [videoLoading, setVideoLoading] = useState(false);
+
   // Modals State
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [showImageMenu, setShowImageMenu] = useState(false);
@@ -39,6 +53,9 @@ const EditPropiedad = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [modal, setModal] = useState({ show: false, message: "", success: true, confirm: false, onConfirm: null });
+
+  const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -57,6 +74,8 @@ const EditPropiedad = () => {
           setObservacion(data.observacion || "");
           setEstado(data.estado || "disponible");
           setImages(data.images || []);
+          // Load existing videos separately — never mixed with images
+          setExistingVideos(data.videos || []);
         } else {
           showNotification("Propiedad no encontrada", false);
           setTimeout(() => navigate("/blog"), 1500);
@@ -210,6 +229,86 @@ const EditPropiedad = () => {
     setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  // --- Video Handling (completely separate from images) ---
+
+  const handleVideoInputChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (videoInputRef.current) videoInputRef.current.value = "";
+    if (!files || files.length === 0) return;
+
+    const currentTotal = existingVideos.length + newVideos.length;
+
+    if (currentTotal + files.length > MAX_VIDEOS_PER_PROPERTY) {
+      const available = MAX_VIDEOS_PER_PROPERTY - currentTotal;
+      showNotification(
+        `Una propiedad puede tener un máximo de ${MAX_VIDEOS_PER_PROPERTY} videos. ` +
+        `Esta propiedad ya tiene ${currentTotal} video${currentTotal !== 1 ? "s" : ""}` +
+        `${available > 0 ? " y solo podés agregar " + available + " más" : " y no podés agregar más hasta eliminar uno existente"}.`,
+        false
+      );
+      return;
+    }
+
+    setVideoLoading(true);
+    const validatedVideos = [];
+    const errors = [];
+
+    for (const file of files) {
+      let duration = 0;
+      try {
+        duration = await getVideoDuration(file);
+      } catch (err) {
+        errors.push(`"${file.name}": No se pudo obtener la duración del video. Asegurate de que sea un archivo MP4 válido.`);
+        continue;
+      }
+
+      const validation = validateVideoFile(file, duration);
+      if (!validation.isValid) {
+        errors.push(validation.error);
+        continue;
+      }
+
+      validatedVideos.push({
+        file,
+        duration,
+        objectUrl: URL.createObjectURL(file),
+      });
+    }
+
+    setVideoLoading(false);
+
+    if (errors.length > 0) {
+      showNotification(errors.join("\n"), false);
+    }
+
+    if (validatedVideos.length > 0) {
+      setNewVideos((prev) => [...prev, ...validatedVideos]);
+    }
+  };
+
+  const handleRemoveExistingVideo = (indexToRemove, e) => {
+    if (e) e.stopPropagation();
+    setExistingVideos((prev) => {
+      const updated = [...prev];
+      const removed = updated.splice(indexToRemove, 1);
+      // Track what was removed (for reference/logging, not used in save logic)
+      setDeletedVideos((prevDeleted) => [...prevDeleted, ...removed]);
+      return updated;
+    });
+  };
+
+  const handleRemoveNewVideo = (indexToRemove, e) => {
+    if (e) e.stopPropagation();
+    setNewVideos((prev) => {
+      const updated = [...prev];
+      if (updated[indexToRemove]?.objectUrl) {
+        URL.revokeObjectURL(updated[indexToRemove].objectUrl);
+      }
+      updated.splice(indexToRemove, 1);
+      return updated;
+    });
+  };
+
   // --- Save Property Changes ---
   const handleSaveProperty = async () => {
     const errores = [];
@@ -234,6 +333,30 @@ const EditPropiedad = () => {
         orderedImages.unshift(mainImg);
       }
 
+      // --- Upload new videos (if any) ---
+      let uploadedNewVideos = [];
+      if (newVideos.length > 0) {
+        const videoFiles = newVideos.map((v) => v.file);
+        const videoUploadResult = await uploadMultipleVideos(
+          videoFiles,
+          id,
+          categoria,
+          operacion
+        );
+
+        if (videoUploadResult.success) {
+          uploadedNewVideos = videoUploadResult.videos;
+        } else if (videoUploadResult.errors?.length > 0) {
+          console.warn("Algunos videos nuevos fallaron al subir:", videoUploadResult.errors);
+          uploadedNewVideos = videoUploadResult.videos;
+        } else {
+          throw new Error(videoUploadResult.error || "Error al subir los videos");
+        }
+      }
+
+      // Combine: existing videos that were NOT deleted + newly uploaded
+      const combinedVideos = [...existingVideos, ...uploadedNewVideos];
+
       const updatedData = {
         titulo: titulo.trim(),
         categoria,
@@ -244,12 +367,23 @@ const EditPropiedad = () => {
         mapsLink: mapsLink.trim(),
         observacion: observacion.trim(),
         estado,
-        images: orderedImages,
+        images: orderedImages,   // images are never touched by video logic
+        videos: combinedVideos,  // separate from images
         updatedAt: new Date().toISOString(),
       };
 
       const docRef = doc(db, "propiedades", id);
       await updateDoc(docRef, updatedData);
+
+      // Revoke object URLs for new videos after successful save
+      newVideos.forEach((v) => {
+        if (v.objectUrl) URL.revokeObjectURL(v.objectUrl);
+      });
+      setNewVideos([]);
+      setDeletedVideos([]);
+      // Update existingVideos to reflect the saved state
+      setExistingVideos(combinedVideos);
+
       showNotification("Propiedad actualizada correctamente.", true);
       setTimeout(() => {
         navigate("/blog");
@@ -603,12 +737,129 @@ const EditPropiedad = () => {
             )}
           </div>
 
+          {/* ===== Sección de Videos ===== */}
+          <div className="crm-video-section">
+            <div className="crm-video-section-header">
+              <div className="crm-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+              </div>
+              <h2 className="crm-card-title">Videos de la propiedad</h2>
+              <span className="crm-video-counter">
+                {existingVideos.length + newVideos.length}/{MAX_VIDEOS_PER_PROPERTY}
+              </span>
+            </div>
+
+            <p className="crm-video-hint">
+              Solo archivos <strong>.mp4</strong>, máx. 2 videos, duración inferior a 5 minutos cada uno.
+            </p>
+
+            {/* Videos existentes (ya guardados en Firestore) */}
+            {existingVideos.length > 0 && (
+              <div className="crm-video-list">
+                <p className="crm-video-section-label">Videos guardados:</p>
+                {existingVideos.map((video, idx) => (
+                  <div key={`existing-${idx}`} className="crm-video-item">
+                    <video
+                      src={video.url}
+                      className="crm-video-preview"
+                      controls
+                      preload="metadata"
+                    />
+                    <div className="crm-video-meta">
+                      <span className="crm-video-name" title={video.fileName || video.url}>
+                        {video.fileName || `Video ${idx + 1}`}
+                      </span>
+                      <span className="crm-video-badge-saved">Guardado</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="crm-video-remove-btn"
+                      title="Quitar este video"
+                      onClick={(e) => handleRemoveExistingVideo(idx, e)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Videos nuevos (pendientes de subir) */}
+            {newVideos.length > 0 && (
+              <div className="crm-video-list">
+                <p className="crm-video-section-label">Videos nuevos (se subirán al guardar):</p>
+                {newVideos.map((video, idx) => (
+                  <div key={`new-${idx}`} className="crm-video-item crm-video-item-new">
+                    <video
+                      src={video.objectUrl}
+                      className="crm-video-preview"
+                      controls
+                      preload="metadata"
+                    />
+                    <div className="crm-video-meta">
+                      <span className="crm-video-name" title={video.file.name}>
+                        {video.file.name}
+                      </span>
+                      <span className="crm-video-duration">
+                        ⏱ {formatVideoDuration(video.duration)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="crm-video-remove-btn"
+                      title="Quitar este video"
+                      onClick={(e) => handleRemoveNewVideo(idx, e)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Input para agregar videos */}
+            {(existingVideos.length + newVideos.length) < MAX_VIDEOS_PER_PROPERTY && (
+              <label className="crm-video-input-label">
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept=".mp4,video/mp4"
+                  multiple
+                  onChange={handleVideoInputChange}
+                  className="crm-video-input-hidden"
+                  disabled={videoLoading || saving}
+                />
+                <span className="crm-video-input-btn">
+                  {videoLoading ? (
+                    <><span className="crm-spinner crm-spinner-sm"></span> Validando...</>
+                  ) : (
+                    <>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Agregar video MP4
+                    </>
+                  )}
+                </span>
+              </label>
+            )}
+
+            {existingVideos.length === 0 && newVideos.length === 0 && (
+              <p className="crm-video-empty">Esta propiedad no tiene videos.</p>
+            )}
+          </div>
+          {/* ============================= */}
+
           {/* Botón Principal Guardar Cambios */}
           <button
             type="button"
             className="crm-save-btn"
             onClick={handleSaveProperty}
-            disabled={saving || deleting}
+            disabled={saving || deleting || videoLoading}
           >
             {saving ? (
               <>

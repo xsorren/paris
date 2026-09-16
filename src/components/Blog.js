@@ -804,6 +804,29 @@ const Blog = () => {
                         <span>👤</span> {property.agente}
                       </div>
                     )}
+
+                    {property.videos && property.videos.length > 0 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: "12px",
+                          right: "12px",
+                          backgroundColor: "rgba(0, 0, 0, 0.75)",
+                          color: "#ffffff",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          padding: "4px 10px",
+                          borderRadius: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          backdropFilter: "blur(4px)",
+                          zIndex: 2,
+                        }}
+                      >
+                        <span>🎥</span> Video
+                      </div>
+                    )}
                   </div>
 
                   <div className="premium-content">

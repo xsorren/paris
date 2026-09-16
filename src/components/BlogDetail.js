@@ -553,6 +553,53 @@ const BlogDetail = () => {
               )}
             </div>
           )}
+
+          {/* Sección de Videos de la propiedad */}
+          {property.videos && property.videos.length > 0 && (
+            <div style={{ marginTop: "30px" }}>
+              <h3 style={styles.sectionTitle}>
+                <span>🎥 Videos de la Propiedad</span>
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: property.videos.length > 1 ? "repeat(auto-fit, minmax(260px, 1fr))" : "1fr",
+                  gap: "16px",
+                  marginTop: "14px",
+                }}
+              >
+                {property.videos.map((vid, idx) => {
+                  const videoUrl = typeof vid === "string" ? vid : (vid?.url || vid?.path);
+                  if (!videoUrl) return null;
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+                        backgroundColor: "#000",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <video
+                        src={videoUrl}
+                        controls
+                        controlsList="nodownload"
+                        playsInline
+                        style={{ width: "100%", maxHeight: "380px", display: "block", borderRadius: "12px", objectFit: "contain" }}
+                        preload="metadata"
+                      >
+                        Tu navegador no soporta el reproductor de video.
+                      </video>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Panel derecho - Información y contacto */}
